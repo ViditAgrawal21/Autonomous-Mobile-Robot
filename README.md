@@ -1,5 +1,5 @@
 
-# 🚗 AGV Fleet Control System – Expo Demo
+# 🤖 AGV Fleet Control System – Expo Demo
 
 This project is a real-time control and visualization interface for an Autonomous Guided Vehicle (AGV) system using Flutter (frontend), Node.js (backend), and ROS2 (robot interface). Designed specifically for an expo demo, it allows you to monitor, control, and interact with your AGV through a clean UI.
 
@@ -114,7 +114,8 @@ Example:
 
 ## 🙌 Contributors
 
-- **[Your Name]** – Frontend (Flutter) & System Architecture
+- **[Vidit Agrawal]** – Frontend (Flutter) & System Architecture
+- **[Vidit Agrawal & Prathamesh Pranjale]** – Backend (Node.js)
 - **ROS Team** – Backend ROS Integration
 
 ---
