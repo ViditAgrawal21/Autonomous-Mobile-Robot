@@ -410,21 +410,43 @@ class _DashBoard_ScreenState extends State<DashBoard_Screen> {
           elevation: 0,
           selectedItemColor: isDark
               ? Colors.redAccent
-              : const Color(0xFF4F8CFF),
+              : const Color(0xFF4F8CFF), // Blue in light, red in dark
           unselectedItemColor: isDark
-              ? Colors.redAccent
-              : Colors.black38,
+              ? Colors.redAccent.withOpacity(0.5)
+              : const Color(
+                  0xFF4F8CFF,
+                ).withOpacity(0.5), // Blue faded in light, red faded in dark
           showSelectedLabels: false,
           showUnselectedLabels: false,
           onTap: _onBottomNavTap,
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.home), label: ''),
-            BottomNavigationBarItem(icon: Icon(Icons.map), label: ''),
-            BottomNavigationBarItem(icon: Icon(Icons.analytics), label: ''),
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.home,
+                color: isDark ? Colors.redAccent : const Color(0xFF4F8CFF),
+              ),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.map,
+                color: isDark ? Colors.redAccent : const Color(0xFF4F8CFF),
+              ),
+              label: '',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(
+                Icons.analytics,
+                color: isDark ? Colors.redAccent : const Color(0xFF4F8CFF),
+              ),
+              label: '',
+            ),
             BottomNavigationBarItem(
               icon: CircleAvatar(
                 radius: 13,
-                backgroundColor: Colors.redAccent,
+                backgroundColor: isDark
+                    ? Colors.redAccent
+                    : const Color(0xFF4F8CFF),
                 child: Icon(Icons.person, color: Colors.white, size: 18),
               ),
               label: '',

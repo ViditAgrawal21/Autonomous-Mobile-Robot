@@ -42,6 +42,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_launcher_icons: ^0.14.3
 
   # The "flutter_lints" package below contains a set of recommended lints to
   # encourage good coding practices. The lint set provided by the package is
@@ -50,12 +51,26 @@ dev_dependencies:
   # rules and activating additional ones.
   flutter_lints: ^5.0.0
 
+flutter_icons:
+  android: true
+  ios: true
+  image_path: "assets/company_logo/app_logo.png"
+
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
 # The following section is specific to Flutter packages.
 flutter:
-
+  assets:
+    # An asset is a file that is bundled and deployed with your app, and
+    # can be accessed at runtime. For Flutter packages, the directory
+    # "assets" is reserved for assets that are used by the package itself.
+    # For example, if you have an image that you want to use in your app,
+    # you can place it in the "assets" directory and access it using
+    # `AssetImage('assets/my_image.png')`.
+    - assets/company_logo/app_logo.png
+    - assets/company_logo/login_logo.png
+    - assets/company_logo/dark_mod_login_logo.png
   # The following line ensures that the Material Icons font is
   # included with your application, so that you can use the icons in
   # the material Icons class.
