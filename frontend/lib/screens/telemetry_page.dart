@@ -1,1 +1,0 @@
-//  Coordinates, battery, etc.

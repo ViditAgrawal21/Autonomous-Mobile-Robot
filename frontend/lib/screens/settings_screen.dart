@@ -47,49 +47,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
-    Color getColor(String color) {
-      switch (color) {
-        case "Blue":
-          return const Color(0xFF4F8CFF);
-        case "Purple":
-          return const Color(0xFFB388FF);
-        case "Green":
-          return const Color(0xFF4FE6A5);
-        default:
-          return const Color(0xFF4F8CFF);
-      }
-    }
-
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFF6F8FB),
+      backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              const SizedBox(height: 24),
-              const Text(
-                'Map Sync & Settings',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Colors.black87,
-                  letterSpacing: 1.1,
-                ),
-              ),
+              // const SizedBox(height: 24),
+              // Text(
+              //   'Map Sync & Settings',
+              //   style: TextStyle(
+              //     fontWeight: FontWeight.w600,
+              //     fontSize: 16,
+              //     color: theme.textTheme.bodyLarge?.color,
+              //     letterSpacing: 1.1,
+              //   ),
+              // ),
               const SizedBox(height: 24),
               Container(
-                width: 350,
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 18),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 18,
+                ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFF4FB),
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(32),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 16,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -98,16 +82,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: theme.iconTheme.color,
+                          ),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         const SizedBox(width: 4),
-                        const Text(
+                        Text(
                           'Settings',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
-                            color: Colors.black,
+                            color: theme.textTheme.bodyLarge?.color,
                           ),
                         ),
                         const Spacer(),
@@ -120,10 +107,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Text(
+                        Text(
                           'Connected',
                           style: TextStyle(
-                            color: Color(0xFF2ECC71),
+                            color: const Color(0xFF2ECC71),
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -137,70 +124,80 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       margin: const EdgeInsets.only(bottom: 18),
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Appearance',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
-                              color: Colors.black,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 10),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              const Text(
+                              Text(
                                 'Dark Mode',
                                 style: TextStyle(
                                   fontWeight: FontWeight.w500,
                                   fontSize: 14,
-                                  color: Colors.black87,
+                                  color: theme.textTheme.bodyLarge?.color,
                                 ),
                               ),
                               Switch(
                                 value: _darkMode,
                                 onChanged: _setTheme,
-                                activeColor: getColor(_themeColor),
+                                activeColor: Colors.redAccent,
                               ),
                             ],
                           ),
-                          const Text(
-                            'Use dark theme',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.black54,
-                            ),
-                          ),
-                          const SizedBox(height: 14),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              _ColorSelector(
-                                color: const Color(0xFF4F8CFF),
-                                selected: _themeColor == "Blue",
-                                label: "Blue",
-                                onTap: () => _setColor("Blue"),
-                              ),
-                              _ColorSelector(
-                                color: const Color(0xFFB388FF),
-                                selected: _themeColor == "Purple",
-                                label: "Purple",
-                                onTap: () => _setColor("Purple"),
-                              ),
-                              _ColorSelector(
-                                color: const Color(0xFF4FE6A5),
-                                selected: _themeColor == "Green",
-                                label: "Green",
-                                onTap: () => _setColor("Green"),
-                              ),
-                            ],
-                          ),
+                          // Text(
+                          //   'Use dark theme',
+                          //   style: TextStyle(
+                          //     fontSize: 12,
+                          //     color: theme.textTheme.bodyMedium?.color,
+                          //   ),
+                          // ),
+                          // Only show color selector if not dark mode
+                          if (!_darkMode) ...[
+                            const SizedBox(height: 16),
+                            // Text(
+                            //   'Theme Color',
+                            //   style: TextStyle(
+                            //     fontWeight: FontWeight.w500,
+                            //     fontSize: 14,
+                            //     color: theme.textTheme.bodyLarge?.color,
+                            //   ),
+                            // ),
+                            // const SizedBox(height: 8),
+                            // Row(
+                            //   children: [
+                            //     _ColorDot(
+                            //       color: const Color(0xFF4F8CFF),
+                            //       selected: _themeColor == "Blue",
+                            //       onTap: () => _setColor("Blue"),
+                            //     ),
+                            //     const SizedBox(width: 8),
+                            //     _ColorDot(
+                            //       color: const Color(0xFFB388FF),
+                            //       selected: _themeColor == "Purple",
+                            //       onTap: () => _setColor("Purple"),
+                            //     ),
+                            //     const SizedBox(width: 8),
+                            //     _ColorDot(
+                            //       color: const Color(0xFF4FE6A5),
+                            //       selected: _themeColor == "Green",
+                            //       onTap: () => _setColor("Green"),
+                            //     ),
+                            //   ],
+                            // ),
+                          ],
                         ],
                       ),
                     ),
@@ -210,18 +207,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       margin: const EdgeInsets.only(bottom: 18),
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Current Map',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
-                              color: Colors.black,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 10),
@@ -229,14 +226,17 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             width: double.infinity,
                             height: 100,
                             decoration: BoxDecoration(
-                              color: const Color(0xFFEFF4FB),
+                              color: theme.cardColor, // <-- changed from Color(0xFFEFF4FB)
                               borderRadius: BorderRadius.circular(12),
                             ),
                             child: Stack(
                               children: [
                                 CustomPaint(
                                   size: const Size(double.infinity, 100),
-                                  painter: _GridPainter(),
+                                  painter: _GridPainter(
+                                    isDark: isDark,
+                                    theme: theme,
+                                  ),
                                 ),
                                 // Dummy obstacles
                                 Positioned(
@@ -246,7 +246,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     width: 40,
                                     height: 18,
                                     decoration: BoxDecoration(
-                                      color: Colors.grey[400],
+                                      color: isDark
+                                          ? Colors.redAccent.withOpacity(0.5)
+                                          : Colors.grey[400],
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                   ),
@@ -258,7 +260,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     width: 35,
                                     height: 28,
                                     decoration: BoxDecoration(
-                                      color: Colors.grey[400],
+                                      color: isDark
+                                          ? Colors.redAccent.withOpacity(0.5)
+                                          : Colors.grey[400],
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                   ),
@@ -270,14 +274,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     width: 50,
                                     height: 14,
                                     decoration: BoxDecoration(
-                                      color: Colors.grey[400],
+                                      color: isDark
+                                          ? Colors.redAccent.withOpacity(0.5)
+                                          : Colors.grey[400],
                                       borderRadius: BorderRadius.circular(6),
                                     ),
                                   ),
                                 ),
                                 // Dummy path
                                 Positioned.fill(
-                                  child: CustomPaint(painter: _PathPainter()),
+                                  child: CustomPaint(
+                                    painter: _PathPainter(
+                                      isDark: isDark,
+                                      theme: theme,
+                                    ),
+                                  ),
                                 ),
                               ],
                             ),
@@ -285,19 +296,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: const [
+                            children: [
                               Text(
                                 'Last edited: Today, 14:32',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.black54,
+                                  color: theme.textTheme.bodyMedium?.color,
                                 ),
                               ),
                               Text(
                                 'Size: 20m x 15m',
                                 style: TextStyle(
                                   fontSize: 12,
-                                  color: Colors.black54,
+                                  color: theme.textTheme.bodyMedium?.color,
                                 ),
                               ),
                             ],
@@ -309,7 +320,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 child: ElevatedButton(
                                   onPressed: () {},
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color(0xFF4F8CFF),
+                                    backgroundColor: theme.primaryColor,
                                     foregroundColor: Colors.white,
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(8),
@@ -321,7 +332,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               ),
                               const SizedBox(width: 8),
                               IconButton(
-                                icon: const Icon(Icons.edit, color: Color(0xFF4F8CFF)),
+                                icon: Icon(
+                                  Icons.edit,
+                                  color: theme.primaryColor,
+                                ),
                                 onPressed: () {},
                               ),
                             ],
@@ -334,27 +348,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Sync Settings',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
-                              color: Colors.black,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 14),
                           DropdownButtonFormField<String>(
                             value: _mapFormat,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: "Map Format",
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
+                              labelStyle: TextStyle(
+                                color: theme.textTheme.bodyLarge?.color,
+                              ),
                             ),
+                            dropdownColor: theme.cardColor,
                             items: const [
                               DropdownMenuItem(
                                 value: "ROS Map (.yaml/.pgm)",
@@ -374,9 +392,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           const SizedBox(height: 12),
                           TextFormField(
                             initialValue: _resolution,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: "Resolution",
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
+                              labelStyle: TextStyle(
+                                color: theme.textTheme.bodyLarge?.color,
+                              ),
+                            ),
+                            style: TextStyle(
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                             onChanged: (val) {
                               setState(() {
@@ -391,11 +415,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
               ),
               const SizedBox(height: 24),
-              // Logout Button
               ElevatedButton.icon(
                 onPressed: () {
-                  // Navigate to login screen and remove all previous routes
-                  Navigator.of(context).pushNamedAndRemoveUntil('/login', (route) => false);
+                  Navigator.of(
+                    context,
+                  ).pushNamedAndRemoveUntil('/login', (route) => false);
                 },
                 icon: const Icon(Icons.logout, color: Colors.white),
                 label: const Text(
@@ -423,68 +447,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
   }
 }
 
-class _ColorSelector extends StatelessWidget {
-  final Color color;
-  final bool selected;
-  final String label;
-  final VoidCallback onTap;
-
-  const _ColorSelector({
-    required this.color,
-    required this.selected,
-    required this.label,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Container(
-            width: 38,
-            height: 38,
-            decoration: BoxDecoration(
-              color: color.withOpacity(0.15),
-              border: Border.all(
-                color: selected ? color : Colors.transparent,
-                width: 3,
-              ),
-              shape: BoxShape.circle,
-            ),
-            child: Center(
-              child: Container(
-                width: 18,
-                height: 18,
-                decoration: BoxDecoration(
-                  color: color,
-                  shape: BoxShape.circle,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: selected ? color : Colors.black54,
-              fontWeight: FontWeight.w600,
-              fontSize: 12,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
 // Grid painter for background
 class _GridPainter extends CustomPainter {
+  final bool isDark;
+  final ThemeData theme;
+  _GridPainter({required this.isDark, required this.theme});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFEFF4FB)
+      ..color = isDark
+          ? theme.cardColor.withOpacity(0.7)
+          : const Color(0xFFEFF4FB)
       ..strokeWidth = 1;
 
     for (double i = 0; i < size.width; i += 24) {
@@ -501,17 +475,24 @@ class _GridPainter extends CustomPainter {
 
 // Dummy path painter for AGV path
 class _PathPainter extends CustomPainter {
+  final bool isDark;
+  final ThemeData theme;
+  _PathPainter({required this.isDark, required this.theme});
+
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path();
     path.moveTo(20, size.height - 30);
     path.cubicTo(
-      size.width * 0.3, size.height * 0.2,
-      size.width * 0.7, size.height * 0.8,
-      size.width - 20, 30,
+      size.width * 0.3,
+      size.height * 0.2,
+      size.width * 0.7,
+      size.height * 0.8,
+      size.width - 20,
+      30,
     );
     final paint = Paint()
-      ..color = const Color(0xFF4F8CFF)
+      ..color = theme.primaryColor
       ..strokeWidth = 3
       ..style = PaintingStyle.stroke;
     canvas.drawPath(path, paint);
@@ -519,4 +500,32 @@ class _PathPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
+}
+
+class _ColorDot extends StatelessWidget {
+  final Color color;
+  final bool selected;
+  final VoidCallback onTap;
+
+  const _ColorDot({
+    required this.color,
+    required this.selected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 28,
+        height: 28,
+        decoration: BoxDecoration(
+          color: color,
+          shape: BoxShape.circle,
+          border: selected ? Border.all(color: Colors.black, width: 3) : null,
+        ),
+      ),
+    );
+  }
 }

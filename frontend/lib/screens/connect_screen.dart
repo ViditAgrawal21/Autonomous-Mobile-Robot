@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:frontend/screens/dashboard_screen.dart';
 
 class ConnectScreen extends StatefulWidget {
-  final bool isDarkMode;
-  const ConnectScreen({Key? key, required this.isDarkMode}) : super(key: key);
+  const ConnectScreen({Key? key}) : super(key: key);
 
   @override
   State<ConnectScreen> createState() => _ConnectScreenState();
@@ -19,7 +18,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
   void _goToDashBoardScreen(BuildContext context) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => DashBoard_Screen(isDarkMode: widget.isDarkMode)),
+      MaterialPageRoute(builder: (context) => DashBoard_Screen()),
     );
   }
 
@@ -34,6 +33,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
@@ -41,23 +41,13 @@ class _ConnectScreenState extends State<ConnectScreen> {
           child: Column(
             children: [
               const SizedBox(height: 24),
-              const Text(
-                'Device Connection',
-                style: TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 16,
-                  color: Colors.black87,
-                  letterSpacing: 1.1,
-                ),
-              ),
-              const SizedBox(height: 24),
               Container(
                 padding: const EdgeInsets.symmetric(
                   vertical: 24,
                   horizontal: 18,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors.transparent,
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(32),
                 ),
                 child: Column(
@@ -67,9 +57,9 @@ class _ConnectScreenState extends State<ConnectScreen> {
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back,
-                            color: Colors.black87,
+                            color: theme.iconTheme.color,
                           ),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
@@ -78,13 +68,13 @@ class _ConnectScreenState extends State<ConnectScreen> {
                       ],
                     ),
                     const SizedBox(height: 8),
-                    const Center(
+                    Center(
                       child: Text(
                         'Connect to AGV',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 20,
-                          color: Colors.black,
+                          color: theme.textTheme.bodyLarge?.color,
                         ),
                       ),
                     ),
@@ -95,72 +85,92 @@ class _ConnectScreenState extends State<ConnectScreen> {
                       margin: const EdgeInsets.only(bottom: 18),
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Connect via IP Address',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
-                              color: Colors.black,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 14),
-                          const Text(
+                          Text(
                             'IP Address',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.black87,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 6),
                           TextField(
                             controller: ipController,
+                            style: TextStyle(
+                              color: theme.textTheme.bodyLarge?.color,
+                            ),
                             decoration: InputDecoration(
                               hintText: '192.168.1.100',
+                              hintStyle: TextStyle(
+                                color: isDark ? Colors.white24 : Colors.black26,
+                              ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 12,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFE0E0E0),
+                                borderSide: BorderSide(
+                                  color: isDark
+                                      ? Colors.white24
+                                      : const Color(0xFFE0E0E0),
                                 ),
                               ),
                               filled: true,
-                              fillColor: const Color(0xFFF6F8FB),
+                              fillColor: isDark
+                                  ? const Color(0xFF181A20)
+                                  : const Color(0xFFF6F8FB),
                             ),
                           ),
                           const SizedBox(height: 14),
-                          const Text(
+                          Text(
                             'Port',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.black87,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 6),
                           TextField(
                             controller: portController,
+                            style: TextStyle(
+                              color: theme.textTheme.bodyLarge?.color,
+                            ),
                             decoration: InputDecoration(
                               hintText: '8080',
+                              hintStyle: TextStyle(
+                                color: isDark ? Colors.white24 : Colors.black26,
+                              ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 12,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFE0E0E0),
+                                borderSide: BorderSide(
+                                  color: isDark
+                                      ? Colors.white24
+                                      : const Color(0xFFE0E0E0),
                                 ),
                               ),
                               filled: true,
-                              fillColor: const Color(0xFFF6F8FB),
+                              fillColor: isDark
+                                  ? const Color(0xFF181A20)
+                                  : const Color(0xFFF6F8FB),
                             ),
                             keyboardType: TextInputType.number,
                           ),
@@ -181,7 +191,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
                                 ),
                                 padding: EdgeInsets.zero,
                                 elevation: 0,
-                                backgroundColor: const Color(0xFF4F8CFF),
+                                backgroundColor: theme.primaryColor,
                                 foregroundColor: Colors.white,
                                 textStyle: const TextStyle(
                                   fontSize: 16,
@@ -200,45 +210,55 @@ class _ConnectScreenState extends State<ConnectScreen> {
                       margin: const EdgeInsets.only(bottom: 18),
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Connect via Device ID',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
-                              color: Colors.black,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 14),
-                          const Text(
+                          Text(
                             'AGV ID',
                             style: TextStyle(
                               fontSize: 13,
-                              color: Colors.black87,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 6),
                           TextField(
                             controller: agvIdController,
+                            style: TextStyle(
+                              color: theme.textTheme.bodyLarge?.color,
+                            ),
                             decoration: InputDecoration(
                               hintText: 'Enter AGV ID',
+                              hintStyle: TextStyle(
+                                color: isDark ? Colors.white24 : Colors.black26,
+                              ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 12,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFE0E0E0),
+                                borderSide: BorderSide(
+                                  color: isDark
+                                      ? Colors.white24
+                                      : const Color(0xFFE0E0E0),
                                 ),
                               ),
                               filled: true,
-                              fillColor: const Color(0xFFF6F8FB),
+                              fillColor: isDark
+                                  ? const Color(0xFF181A20)
+                                  : const Color(0xFFF6F8FB),
                             ),
                           ),
                           const SizedBox(height: 18),
@@ -259,7 +279,7 @@ class _ConnectScreenState extends State<ConnectScreen> {
                                 ),
                                 padding: EdgeInsets.zero,
                                 elevation: 0,
-                                backgroundColor: const Color(0xFF4F8CFF),
+                                backgroundColor: theme.primaryColor,
                                 foregroundColor: Colors.white,
                                 textStyle: const TextStyle(
                                   fontSize: 16,
@@ -277,26 +297,26 @@ class _ConnectScreenState extends State<ConnectScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(18),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Saved Devices',
                             style: TextStyle(
                               fontWeight: FontWeight.w600,
                               fontSize: 15,
-                              color: Colors.black,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 10),
                           if (savedDevices.isEmpty)
-                            const Text(
+                            Text(
                               'No saved devices.',
                               style: TextStyle(
-                                color: Colors.black54,
+                                color: theme.textTheme.bodyMedium?.color,
                                 fontSize: 13,
                               ),
                             )
@@ -308,8 +328,8 @@ class _ConnectScreenState extends State<ConnectScreen> {
                                 ),
                                 child: Text(
                                   device,
-                                  style: const TextStyle(
-                                    color: Colors.black87,
+                                  style: TextStyle(
+                                    color: theme.textTheme.bodyLarge?.color,
                                     fontSize: 14,
                                   ),
                                 ),

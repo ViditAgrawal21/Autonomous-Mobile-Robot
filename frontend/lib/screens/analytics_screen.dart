@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class AnalyticsScreen extends StatelessWidget {
-  final bool isDarkMode;
-  const AnalyticsScreen({Key? key, required this.isDarkMode}) : super(key: key);
+  // final bool isDarkMode;
+  const AnalyticsScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    final theme  = Theme.of(context);
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+
     // Example analytics data
     final List<Map<String, String>> analyticsData = [
       {'title': 'Total AGVs', 'value': '12'},
@@ -25,19 +27,19 @@ class AnalyticsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.transparent,
+        backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: const Text(
-          'Analytics Dashboard',
-          style: TextStyle(
-            color: Colors.black87,
-            fontWeight: FontWeight.w600,
-            fontSize: 18,
-            letterSpacing: 1.1,
-          ),
-        ),
+        // title: Text(
+        //   'Analytics Dashboard',
+        //   style: TextStyle(
+        //     color: theme.textTheme.bodyLarge?.color,
+        //     fontWeight: FontWeight.w600,
+        //     fontSize: 18,
+        //     letterSpacing: 1.1,
+        //   ),
+        // ),
         centerTitle: true,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: IconThemeData(color: theme.iconTheme.color),
       ),
       body: Center(
         child: SingleChildScrollView(
@@ -46,12 +48,12 @@ class AnalyticsScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
+                Text(
                   'Analytics Overview',
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 20,
-                    color: Colors.black,
+                    color: theme.textTheme.bodyLarge?.color,
                   ),
                 ),
                 const SizedBox(height: 24),

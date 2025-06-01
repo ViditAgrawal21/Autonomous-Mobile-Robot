@@ -1,5 +1,4 @@
 //Show/edit live map
-
 import 'package:flutter/material.dart';
 
 // Dummy map data (replace with real map data from control screen)
@@ -10,8 +9,8 @@ class MapObject {
 }
 
 class MapPage extends StatefulWidget {
-  final bool isDarkMode;
-  const MapPage({Key? key, required this.isDarkMode}) : super(key: key);
+  // final bool isDarkMode;
+  const MapPage({Key? key}) : super(key: key);
 
   @override
   State<MapPage> createState() => _MapPageState();
@@ -34,6 +33,7 @@ class _MapPageState extends State<MapPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
@@ -41,29 +41,26 @@ class _MapPageState extends State<MapPage> {
           child: Column(
             children: [
               const SizedBox(height: 24),
-              const Text(
+              Text(
                 'Map Editing Interface',
                 style: TextStyle(
                   fontWeight: FontWeight.w600,
                   fontSize: 16,
-                  color: Colors.black87,
+                  color: theme.textTheme.bodyLarge?.color,
                   letterSpacing: 1.1,
                 ),
               ),
               const SizedBox(height: 24),
               Container(
-                width: 350,
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 18),
+                // width: 350, // Remove fixed width for responsiveness
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 18,
+                ),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFEFF4FB),
+                  color: theme.cardColor,
                   borderRadius: BorderRadius.circular(32),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black12,
-                      blurRadius: 16,
-                      offset: Offset(0, 8),
-                    ),
-                  ],
+                  // Remove boxShadow for flat look
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -72,25 +69,28 @@ class _MapPageState extends State<MapPage> {
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(Icons.arrow_back, color: Colors.black87),
+                          icon: Icon(
+                            Icons.arrow_back,
+                            color: theme.iconTheme.color,
+                          ),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         const SizedBox(width: 4),
-                        const Text(
+                        Text(
                           'Map Editor',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
-                            color: Colors.black,
+                            color: theme.textTheme.bodyLarge?.color,
                           ),
                         ),
                         const Spacer(),
                         IconButton(
-                          icon: const Icon(Icons.upload, color: Color(0xFF4F8CFF)),
+                          icon: Icon(Icons.upload, color: theme.primaryColor),
                           onPressed: () {},
                         ),
                         IconButton(
-                          icon: const Icon(Icons.download, color: Color(0xFF4F8CFF)),
+                          icon: Icon(Icons.download, color: theme.primaryColor),
                           onPressed: () {},
                         ),
                       ],
@@ -102,14 +102,19 @@ class _MapPageState extends State<MapPage> {
                         width: 270,
                         height: 180,
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: theme.brightness == Brightness.dark
+                              ? const Color(0xFF23242B)
+                              : Colors.white,
                           borderRadius: BorderRadius.circular(18),
                         ),
                         child: Stack(
                           children: [
                             CustomPaint(
                               size: const Size(270, 180),
-                              painter: _GridPainter(),
+                              painter: _GridPainter(
+                                isDark: isDark,
+                                theme: theme,
+                              ),
                             ),
                             // Obstacles
                             ...obstacles.asMap().entries.map((entry) {
@@ -131,15 +136,24 @@ class _MapPageState extends State<MapPage> {
                                         width: obj.size.width,
                                         height: obj.size.height,
                                         decoration: BoxDecoration(
-                                          color: Colors.grey[400],
-                                          borderRadius: BorderRadius.circular(6),
+                                          color: isDark
+                                              ? Colors.redAccent.withOpacity(
+                                                  0.5,
+                                                )
+                                              : Colors.grey[400],
+                                          borderRadius: BorderRadius.circular(
+                                            6,
+                                          ),
                                         ),
                                       ),
                                       if (isSelected)
                                         Positioned.fill(
                                           child: IgnorePointer(
                                             child: CustomPaint(
-                                              painter: _SelectionPainter(),
+                                              painter: _SelectionPainter(
+                                                isDark: isDark,
+                                                theme: theme,
+                                              ),
                                             ),
                                           ),
                                         ),
@@ -150,7 +164,12 @@ class _MapPageState extends State<MapPage> {
                             }),
                             // Dummy path
                             Positioned.fill(
-                              child: CustomPaint(painter: _PathPainter()),
+                              child: CustomPaint(
+                                painter: _PathPainter(
+                                  isDark: isDark,
+                                  theme: theme,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -162,33 +181,39 @@ class _MapPageState extends State<MapPage> {
                       children: [
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF6F8FB),
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.search, color: Colors.black54),
+                            icon: Icon(
+                              Icons.search,
+                              color: theme.iconTheme.color,
+                            ),
                             onPressed: () {},
                           ),
                         ),
                         const SizedBox(width: 8),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF6F8FB),
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.add, color: Colors.black54),
+                            icon: Icon(Icons.add, color: theme.iconTheme.color),
                             onPressed: () {},
                           ),
                         ),
                         const SizedBox(width: 8),
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(0xFFF6F8FB),
+                            color: theme.cardColor,
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: IconButton(
-                            icon: const Icon(Icons.remove, color: Colors.black54),
+                            icon: Icon(
+                              Icons.remove,
+                              color: theme.iconTheme.color,
+                            ),
                             onPressed: () {},
                           ),
                         ),
@@ -196,12 +221,12 @@ class _MapPageState extends State<MapPage> {
                     ),
                     const SizedBox(height: 16),
                     // Editing Tools
-                    const Text(
+                    Text(
                       'Editing Tools',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 15,
-                        color: Colors.black,
+                        color: theme.textTheme.bodyLarge?.color,
                       ),
                     ),
                     const SizedBox(height: 10),
@@ -214,66 +239,83 @@ class _MapPageState extends State<MapPage> {
                           label: "Pencil",
                           selected: selectedTool == "Pencil",
                           onTap: () => setState(() => selectedTool = "Pencil"),
+                          isDark: isDark,
+                          theme: theme,
                         ),
                         _ToolButton(
                           icon: Icons.delete_outline,
                           label: "Eraser",
                           selected: selectedTool == "Eraser",
                           onTap: () => setState(() => selectedTool = "Eraser"),
+                          isDark: isDark,
+                          theme: theme,
                         ),
                         _ToolButton(
                           icon: Icons.crop_16_9,
                           label: "Rectangle",
                           selected: selectedTool == "Rectangle",
-                          onTap: () => setState(() => selectedTool = "Rectangle"),
+                          onTap: () =>
+                              setState(() => selectedTool = "Rectangle"),
+                          isDark: isDark,
+                          theme: theme,
                         ),
                         _ToolButton(
                           icon: Icons.select_all,
                           label: "Select",
                           selected: selectedTool == "Select",
                           onTap: () => setState(() => selectedTool = "Select"),
+                          isDark: isDark,
+                          theme: theme,
                         ),
                         _ToolButton(
                           icon: Icons.circle_outlined,
                           label: "Circle",
                           selected: selectedTool == "Circle",
                           onTap: () => setState(() => selectedTool = "Circle"),
+                          isDark: isDark,
+                          theme: theme,
                         ),
                         _ToolButton(
                           icon: Icons.open_in_full,
                           label: "Resize",
                           selected: selectedTool == "Resize",
                           onTap: () => setState(() => selectedTool = "Resize"),
+                          isDark: isDark,
+                          theme: theme,
                         ),
                         _ToolButton(
                           icon: Icons.rotate_right,
                           label: "Rotate",
                           selected: selectedTool == "Rotate",
                           onTap: () => setState(() => selectedTool = "Rotate"),
+                          isDark: isDark,
+                          theme: theme,
                         ),
                         _ToolButton(
                           icon: Icons.edit_note,
                           label: "Edit",
                           selected: selectedTool == "Edit",
                           onTap: () => setState(() => selectedTool = "Edit"),
+                          isDark: isDark,
+                          theme: theme,
                         ),
                       ],
                     ),
                     const SizedBox(height: 18),
                     // Properties
-                    const Text(
+                    Text(
                       'Properties',
                       style: TextStyle(
                         fontWeight: FontWeight.w600,
                         fontSize: 15,
-                        color: Colors.black,
+                        color: theme.textTheme.bodyLarge?.color,
                       ),
                     ),
                     const SizedBox(height: 10),
                     Container(
                       padding: const EdgeInsets.all(14),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Column(
@@ -281,10 +323,14 @@ class _MapPageState extends State<MapPage> {
                         children: [
                           DropdownButtonFormField<String>(
                             value: objectType,
-                            decoration: const InputDecoration(
+                            decoration: InputDecoration(
                               labelText: "Object Type",
-                              border: OutlineInputBorder(),
+                              border: const OutlineInputBorder(),
+                              labelStyle: TextStyle(
+                                color: theme.textTheme.bodyLarge?.color,
+                              ),
                             ),
+                            dropdownColor: theme.cardColor,
                             items: const [
                               DropdownMenuItem(
                                 value: "Obstacle",
@@ -307,11 +353,17 @@ class _MapPageState extends State<MapPage> {
                               Expanded(
                                 child: TextFormField(
                                   initialValue: width.toString(),
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: "Width (cm)",
-                                    border: OutlineInputBorder(),
+                                    border: const OutlineInputBorder(),
+                                    labelStyle: TextStyle(
+                                      color: theme.textTheme.bodyLarge?.color,
+                                    ),
                                   ),
                                   keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                    color: theme.textTheme.bodyLarge?.color,
+                                  ),
                                   onChanged: (val) {
                                     setState(() {
                                       width = double.tryParse(val) ?? width;
@@ -323,11 +375,17 @@ class _MapPageState extends State<MapPage> {
                               Expanded(
                                 child: TextFormField(
                                   initialValue: height.toString(),
-                                  decoration: const InputDecoration(
+                                  decoration: InputDecoration(
                                     labelText: "Height (cm)",
-                                    border: OutlineInputBorder(),
+                                    border: const OutlineInputBorder(),
+                                    labelStyle: TextStyle(
+                                      color: theme.textTheme.bodyLarge?.color,
+                                    ),
                                   ),
                                   keyboardType: TextInputType.number,
+                                  style: TextStyle(
+                                    color: theme.textTheme.bodyLarge?.color,
+                                  ),
                                   onChanged: (val) {
                                     setState(() {
                                       height = double.tryParse(val) ?? height;
@@ -358,12 +416,16 @@ class _ToolButton extends StatelessWidget {
   final String label;
   final bool selected;
   final VoidCallback onTap;
+  final bool isDark;
+  final ThemeData theme;
 
   const _ToolButton({
     required this.icon,
     required this.label,
     required this.selected,
     required this.onTap,
+    required this.isDark,
+    required this.theme,
   });
 
   @override
@@ -374,22 +436,32 @@ class _ToolButton extends StatelessWidget {
         width: 80,
         height: 44,
         decoration: BoxDecoration(
-          color: selected ? const Color(0xFFEDF4FF) : Colors.white,
+          color: selected
+              ? (isDark
+                    ? theme.primaryColor.withOpacity(0.15)
+                    : const Color(0xFFEDF4FF))
+              : (isDark ? theme.cardColor : Colors.white),
           borderRadius: BorderRadius.circular(10),
           border: Border.all(
-            color: selected ? const Color(0xFF4F8CFF) : Colors.grey.shade300,
+            color: selected
+                ? theme.primaryColor
+                : (isDark ? Colors.white24 : Colors.grey.shade300),
             width: selected ? 2 : 1,
           ),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: selected ? const Color(0xFF4F8CFF) : Colors.black54, size: 20),
+            Icon(
+              icon,
+              color: selected ? theme.primaryColor : theme.iconTheme.color,
+              size: 20,
+            ),
             const SizedBox(height: 2),
             Text(
               label,
               style: TextStyle(
-                color: selected ? const Color(0xFF4F8CFF) : Colors.black54,
+                color: selected ? theme.primaryColor : theme.iconTheme.color,
                 fontWeight: FontWeight.w600,
                 fontSize: 12,
               ),
@@ -403,10 +475,16 @@ class _ToolButton extends StatelessWidget {
 
 // Grid painter for background
 class _GridPainter extends CustomPainter {
+  final bool isDark;
+  final ThemeData theme;
+  _GridPainter({required this.isDark, required this.theme});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFEFF4FB)
+      ..color = isDark
+          ? theme.cardColor.withOpacity(0.7)
+          : const Color(0xFFEFF4FB)
       ..strokeWidth = 1;
 
     for (double i = 0; i < size.width; i += 24) {
@@ -423,17 +501,24 @@ class _GridPainter extends CustomPainter {
 
 // Dummy path painter for AGV path
 class _PathPainter extends CustomPainter {
+  final bool isDark;
+  final ThemeData theme;
+  _PathPainter({required this.isDark, required this.theme});
+
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path();
     path.moveTo(20, size.height - 40);
     path.cubicTo(
-      size.width * 0.3, size.height * 0.2,
-      size.width * 0.7, size.height * 0.8,
-      size.width - 20, 40,
+      size.width * 0.3,
+      size.height * 0.2,
+      size.width * 0.7,
+      size.height * 0.8,
+      size.width - 20,
+      40,
     );
     final paint = Paint()
-      ..color = const Color(0xFF4F8CFF)
+      ..color = theme.primaryColor
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke;
     canvas.drawPath(path, paint);
@@ -445,22 +530,30 @@ class _PathPainter extends CustomPainter {
 
 // Selection painter for selected obstacle
 class _SelectionPainter extends CustomPainter {
+  final bool isDark;
+  final ThemeData theme;
+  _SelectionPainter({required this.isDark, required this.theme});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFF4F8CFF)
+      ..color = theme.primaryColor
       ..strokeWidth = 2
       ..style = PaintingStyle.stroke;
     // Draw rectangle border
     canvas.drawRect(Offset.zero & size, paint);
 
     // Draw handles (circles at corners)
-    final handlePaint = Paint()..color = const Color(0xFF4F8CFF);
+    final handlePaint = Paint()..color = theme.primaryColor;
     const handleRadius = 5.0;
     canvas.drawCircle(const Offset(0, 0), handleRadius, handlePaint);
     canvas.drawCircle(Offset(size.width, 0), handleRadius, handlePaint);
     canvas.drawCircle(Offset(0, size.height), handleRadius, handlePaint);
-    canvas.drawCircle(Offset(size.width, size.height), handleRadius, handlePaint);
+    canvas.drawCircle(
+      Offset(size.width, size.height),
+      handleRadius,
+      handlePaint,
+    );
   }
 
   @override

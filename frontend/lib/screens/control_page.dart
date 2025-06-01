@@ -1,34 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_joystick/flutter_joystick.dart';
-import 'dart:math';
 
 class ControlPage extends StatefulWidget {
-  final bool isDarkMode;
-  const ControlPage({Key? key, required this.isDarkMode}) : super(key: key);
+  const ControlPage({Key? key}) : super(key: key);
 
   @override
   State<ControlPage> createState() => _ControlPageState();
 }
 
 class _ControlPageState extends State<ControlPage> {
-  // Dot position as a fraction of the map area (0.0 - 1.0)
   double dotX = 0.5;
   double dotY = 0.5;
-
-  // Map area size (used for calculating dot position)
-  static const double mapWidth = 310;
-  static const double mapHeight = 180;
-
-  // Joystick sensitivity
-  static const double moveStep = 0.015;
+  final double moveStep = 0.05;
 
   void _onJoystickMove(StickDragDetails details) {
     setState(() {
-      // Update dot position based on joystick direction
       dotX += details.x * moveStep;
-      dotY -= details.y * moveStep; // Y is inverted for UI
-
-      // Clamp between 0 and 1
+      dotY += details.y * moveStep; // <-- changed to plus
       dotX = dotX.clamp(0.0, 1.0);
       dotY = dotY.clamp(0.0, 1.0);
     });
@@ -36,37 +24,55 @@ class _ControlPageState extends State<ControlPage> {
 
   @override
   Widget build(BuildContext context) {
-    // Dummy values for distance, area, duration
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     const distance = "24.5 m";
     const area = "42 m²";
     const duration = "05:23";
 
+    // Colors for joystick
+    final baseColor = isDark
+        ? Colors.black
+        : const Color(0xFFE0E0E0); // greyish in light mode
+    final arrowsColor = isDark ? Colors.red : Colors.blue;
+    final stickColor = isDark ? Colors.red : Colors.blue;
+
     return Scaffold(
-      
-      backgroundColor: theme.scaffoldBackgroundColor,
+      backgroundColor: isDark
+          ? theme.scaffoldBackgroundColor
+          : const Color(0xFFF6F8FB),
       body: Center(
         child: SingleChildScrollView(
           child: Column(
             children: [
-              // const SizedBox(height: 24),
-              // const Text(
+              // const SizedBox(height: 18),
+              // Text(
               //   'Map Creation & Tracking',
               //   style: TextStyle(
               //     fontWeight: FontWeight.w600,
               //     fontSize: 16,
-              //     color: Colors.black87,
+              //     color: theme.textTheme.bodyLarge?.color,
               //     letterSpacing: 1.1,
               //   ),
               // ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 18),
               Container(
-                // width: 350, // REMOVE this line for dynamic width
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 18),
+                margin: const EdgeInsets.symmetric(horizontal: 12),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 24,
+                  horizontal: 18,
+                ),
                 decoration: BoxDecoration(
-                  color: Colors.transparent, // Change from Color(0xFFEFF4FB) to transparent
-                  borderRadius: BorderRadius.circular(32),
-                  // Remove boxShadow if present
+                  color: isDark ? theme.cardColor : Colors.white,
+                  borderRadius: BorderRadius.circular(28),
+                  boxShadow: [
+                    if (!isDark)
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 16,
+                        offset: const Offset(0, 4),
+                      ),
+                  ],
                 ),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,19 +81,19 @@ class _ControlPageState extends State<ControlPage> {
                     Row(
                       children: [
                         IconButton(
-                          icon: const Icon(
+                          icon: Icon(
                             Icons.arrow_back,
-                            color: Colors.black87,
+                            color: theme.iconTheme.color,
                           ),
                           onPressed: () => Navigator.of(context).pop(),
                         ),
                         const SizedBox(width: 4),
-                        const Text(
+                        Text(
                           'Map Creation',
                           style: TextStyle(
                             fontWeight: FontWeight.bold,
                             fontSize: 20,
-                            color: Colors.black,
+                            color: theme.textTheme.bodyLarge?.color,
                           ),
                         ),
                         const Spacer(),
@@ -100,10 +106,10 @@ class _ControlPageState extends State<ControlPage> {
                           ),
                         ),
                         const SizedBox(width: 6),
-                        const Text(
+                        Text(
                           'Recording',
                           style: TextStyle(
-                            color: Color(0xFF2ECC71),
+                            color: const Color(0xFF2ECC71),
                             fontWeight: FontWeight.w600,
                             fontSize: 13,
                           ),
@@ -111,223 +117,195 @@ class _ControlPageState extends State<ControlPage> {
                       ],
                     ),
                     const SizedBox(height: 18),
-                    // Map area with moving dot
+                    // Map Canvas
                     Center(
-                      child: Stack(
-                        children: [
-                          Container(
-                            width: mapWidth,
-                            height: mapHeight,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(18),
-                            ),
-                            child: Stack(
-                              children: [
-                                // Grid background
-                                CustomPaint(
-                                  size: const Size(mapWidth, mapHeight),
-                                  painter: _GridPainter(),
-                                ),
-                                // Dummy obstacles
-                                Positioned(
-                                  left: 40,
-                                  top: 30,
-                                  child: Container(
-                                    width: 50,
-                                    height: 25,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[400],
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 180,
-                                  top: 60,
-                                  child: Container(
-                                    width: 45,
-                                    height: 35,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[400],
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                  ),
-                                ),
-                                Positioned(
-                                  left: 90,
-                                  top: 120,
-                                  child: Container(
-                                    width: 70,
-                                    height: 20,
-                                    decoration: BoxDecoration(
-                                      color: Colors.grey[400],
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                  ),
-                                ),
-                                // Dummy path
-                                Positioned.fill(
-                                  child: CustomPaint(painter: _PathPainter()),
-                                ),
-                                // Moving dot
-                                Positioned(
-                                  left: dotX * (mapWidth - 16) - 8,
-                                  top: dotY * (mapHeight - 16) - 8,
-                                  child: Container(
-                                    width: 16,
-                                    height: 16,
-                                    decoration: const BoxDecoration(
-                                      color: Color(0xFFB71C1C), // Dark red
-                                      shape: BoxShape.circle,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
+                      child: Container(
+                        width: 240,
+                        height: 180,
+                        decoration: BoxDecoration(
+                          color: isDark
+                              ? theme.cardColor
+                              : const Color(0xFFF6F8FB),
+                          borderRadius: BorderRadius.circular(18),
+                          border: Border.all(
+                            color: isDark
+                                ? Colors.white12
+                                : const Color(0xFFE0E0E0),
+                            width: 1.5,
                           ),
-                        ],
+                        ),
+                        child: Stack(
+                          children: [
+                            CustomPaint(
+                              size: const Size(240, 180),
+                              painter: _GridPainter(
+                                isDark: isDark,
+                                theme: theme,
+                              ),
+                            ),
+                            // Obstacles (dummy)
+                            Positioned(
+                              left: 30,
+                              top: 24,
+                              child: Container(
+                                width: 50,
+                                height: 22,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: 140,
+                              top: 60,
+                              child: Container(
+                                width: 45,
+                                height: 35,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              left: 80,
+                              top: 120,
+                              child: Container(
+                                width: 70,
+                                height: 20,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey[400],
+                                  borderRadius: BorderRadius.circular(6),
+                                ),
+                              ),
+                            ),
+                            // Path (dummy)
+                            Positioned.fill(
+                              child: CustomPaint(
+                                painter: _PathPainter(
+                                  isDark: isDark,
+                                  theme: theme,
+                                ),
+                              ),
+                            ),
+                            // Moving Dot
+                            Positioned(
+                              left: dotX * 220,
+                              top: dotY * 160,
+                              child: Container(
+                                width: 16,
+                                height: 16,
+                                decoration: BoxDecoration(
+                                  color: isDark ? Colors.red : Colors.blue,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.white,
+                                    width: 2,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                     const SizedBox(height: 12),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF6F8FB),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.search,
-                              color: Colors.black54,
-                            ),
-                            onPressed: () {},
-                          ),
-                        ),
+                        _MapIconBtn(icon: Icons.search, onTap: () {}),
                         const SizedBox(width: 8),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF6F8FB),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(Icons.add, color: Colors.black54),
-                            onPressed: () {},
-                          ),
-                        ),
+                        _MapIconBtn(icon: Icons.add, onTap: () {}),
                         const SizedBox(width: 8),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF6F8FB),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: IconButton(
-                            icon: const Icon(
-                              Icons.remove,
-                              color: Colors.black54,
-                            ),
-                            onPressed: () {},
-                          ),
-                        ),
+                        _MapIconBtn(icon: Icons.remove, onTap: () {}),
                       ],
                     ),
-                    const SizedBox(height: 16),
-                    // Distance, Area, Duration
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        _InfoCard(label: "Distance", value: distance),
-                        _InfoCard(label: "Area", value: area),
-                        _InfoCard(label: "Duration", value: duration),
-                      ],
-                    ),
-                    const SizedBox(height: 24),
-                    const Text(
-                      'Manual Control',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: Colors.black,
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    // Centered Joystick
-                    Center(
-                      child: Container(
-                        width: 180,
-                        height: 180,
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(90),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black.withOpacity(0.03),
-                              blurRadius: 4,
-                              offset: const Offset(0, 2),
-                            ),
-                          ],
-                        ),
-                        child: Center(
-                          child: Joystick(
-                            mode: JoystickMode.all,
-                            listener: _onJoystickMove,
-                            base: Container(
-                              width: 140,
-                              height: 140,
-                              decoration: BoxDecoration(
-                                color: const Color(0xFFF6F8FB),
-                                shape: BoxShape.circle,
-                              ),
-                            ),
-                            stick: Container(
-                              width: 60,
-                              height: 60,
-                              decoration: const BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [Color(0xFF4F8CFF), Color(0xFF6F6CFF)],
-                                  begin: Alignment.topLeft,
-                                  end: Alignment.bottomRight,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: 14),
+                    // Info Row
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFB7F8C7),
-                            foregroundColor: Colors.green[800],
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            elevation: 0,
-                            minimumSize: const Size(80, 40),
-                          ),
-                          child: const Text('Start'),
+                        _InfoBlock(
+                          label: "Distance",
+                          value: distance,
+                          theme: theme,
                         ),
-                        ElevatedButton(
-                          onPressed: () {},
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFFFD6D6),
-                            foregroundColor: Colors.red,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            elevation: 0,
-                            minimumSize: const Size(80, 40),
-                          ),
-                          child: const Text('Stop'),
+                        _InfoBlock(label: "Area", value: area, theme: theme),
+                        _InfoBlock(
+                          label: "Duration",
+                          value: duration,
+                          theme: theme,
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 24),
+                    Text(
+                      'Manual Control',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        color: theme.textTheme.bodyLarge?.color,
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(18),
+                      decoration: BoxDecoration(
+                        color: isDark ? theme.cardColor : Colors.white,
+                        borderRadius: BorderRadius.circular(18),
+                        boxShadow: [
+                          if (!isDark)
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.04),
+                              blurRadius: 8,
+                              offset: const Offset(0, 2),
+                            ),
+                        ],
+                      ),
+                      child: Column(
+                        children: [
+                          Joystick(
+                            base: JoystickBase(
+                              decoration: JoystickBaseDecoration(
+                                color: baseColor,
+                                drawOuterCircle: false,
+                              ),
+                              arrowsDecoration: JoystickArrowsDecoration(
+                                color: arrowsColor,
+                              ),
+                            ),
+                            stick: Container(
+                              width: 40,
+                              height: 40,
+                              decoration: BoxDecoration(
+                                color: stickColor,
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                            mode: JoystickMode.all,
+                            listener: _onJoystickMove,
+                          ),
+                          const SizedBox(height: 18),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              _ControlButton(
+                                label: "Start",
+                                color: Colors.green[200]!,
+                                textColor: Colors.green[900]!,
+                                onTap: () {},
+                              ),
+                              _ControlButton(
+                                label: "Stop",
+                                color: Colors.red[200]!,
+                                textColor: Colors.red[900]!,
+                                onTap: () {},
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -341,34 +319,81 @@ class _ControlPageState extends State<ControlPage> {
   }
 }
 
-class _InfoCard extends StatelessWidget {
+class _MapIconBtn extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+  const _MapIconBtn({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardColor,
+        borderRadius: BorderRadius.circular(8),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 2,
+            offset: const Offset(0, 1),
+          ),
+        ],
+      ),
+      child: IconButton(
+        icon: Icon(icon, color: theme.iconTheme.color),
+        onPressed: onTap,
+      ),
+    );
+  }
+}
+
+class _InfoBlock extends StatelessWidget {
   final String label;
   final String value;
-  const _InfoCard({required this.label, required this.value});
+  final ThemeData theme;
+
+  const _InfoBlock({
+    required this.label,
+    required this.value,
+    required this.theme,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 90,
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      width: 80,
+      padding: const EdgeInsets.symmetric(vertical: 10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: theme.brightness == Brightness.dark
+            ? const Color(0xFF23242B)
+            : Colors.white,
         borderRadius: BorderRadius.circular(12),
+        boxShadow: [
+          if (theme.brightness != Brightness.dark)
+            BoxShadow(
+              color: Colors.black.withOpacity(0.04),
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+        ],
       ),
       child: Column(
         children: [
           Text(
             value,
-            style: const TextStyle(
+            style: TextStyle(
               fontWeight: FontWeight.bold,
               fontSize: 16,
-              color: Color(0xFF4F8CFF),
+              color: theme.primaryColor,
             ),
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(color: Colors.black87, fontSize: 13),
+            style: TextStyle(
+              color: theme.textTheme.bodyMedium?.color,
+              fontSize: 12,
+            ),
           ),
         ],
       ),
@@ -376,12 +401,58 @@ class _InfoCard extends StatelessWidget {
   }
 }
 
-// Dummy grid painter for background
+class _ControlButton extends StatelessWidget {
+  final String label;
+  final Color color;
+  final Color textColor;
+  final VoidCallback onTap;
+
+  const _ControlButton({
+    required this.label,
+    required this.color,
+    required this.textColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Container(
+        margin: const EdgeInsets.symmetric(horizontal: 8),
+        child: ElevatedButton(
+          onPressed: onTap,
+          style: ElevatedButton.styleFrom(
+            backgroundColor: color,
+            foregroundColor: textColor,
+            minimumSize: const Size(0, 44),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            elevation: 0,
+            textStyle: const TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 16,
+            ),
+          ),
+          child: Text(label),
+        ),
+      ),
+    );
+  }
+}
+
+// Grid painter for background
 class _GridPainter extends CustomPainter {
+  final bool isDark;
+  final ThemeData theme;
+  _GridPainter({required this.isDark, required this.theme});
+
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = const Color(0xFFEFF4FB)
+      ..color = isDark
+          ? theme.cardColor.withOpacity(0.7)
+          : const Color(0xFFEFF4FB)
       ..strokeWidth = 1;
 
     for (double i = 0; i < size.width; i += 24) {
@@ -398,6 +469,10 @@ class _GridPainter extends CustomPainter {
 
 // Dummy path painter for AGV path
 class _PathPainter extends CustomPainter {
+  final bool isDark;
+  final ThemeData theme;
+  _PathPainter({required this.isDark, required this.theme});
+
   @override
   void paint(Canvas canvas, Size size) {
     final path = Path();
@@ -411,7 +486,7 @@ class _PathPainter extends CustomPainter {
       40,
     );
     final paint = Paint()
-      ..color = const Color(0xFF4F8CFF)
+      ..color = theme.primaryColor
       ..strokeWidth = 4
       ..style = PaintingStyle.stroke;
     canvas.drawPath(path, paint);

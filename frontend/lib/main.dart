@@ -19,7 +19,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  bool isDarkMode = false;
+  bool isDarkMode = true;
   String themeColor = "Blue";
 
   ThemeData get _lightTheme {
@@ -34,17 +34,37 @@ class _MyAppState extends State<MyApp> {
     );
   }
 
-  ThemeData get _darkTheme {
-    Color primary = _getPrimaryColor();
-    return ThemeData(
-      brightness: Brightness.dark,
-      primaryColor: primary,
-      scaffoldBackgroundColor: const Color(0xFF181A20),
-      cardColor: const Color(0xFF23242B),
-      iconTheme: IconThemeData(color: primary),
-      colorScheme: ColorScheme.dark(primary: primary),
-    );
-  }
+  ThemeData get _darkTheme => ThemeData(
+    brightness: Brightness.dark,
+    primaryColor: Colors.redAccent,
+    scaffoldBackgroundColor: Colors.black,
+    cardColor: const Color(0xFF181A20),
+    iconTheme: const IconThemeData(color: Colors.redAccent),
+    colorScheme: const ColorScheme.dark(
+      primary: Colors.redAccent,
+      secondary: Colors.redAccent,
+      background: Colors.black,
+      surface: Color(0xFF181A20),
+    ),
+    textTheme: const TextTheme(
+      bodyLarge: TextStyle(color: Colors.white),
+      bodyMedium: TextStyle(color: Colors.white70),
+      titleLarge: TextStyle(color: Colors.white),
+    ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: Colors.black,
+      iconTheme: IconThemeData(color: Colors.redAccent),
+      titleTextStyle: TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+        fontSize: 20,
+      ),
+    ),
+    switchTheme: SwitchThemeData(
+      thumbColor: MaterialStatePropertyAll(Colors.redAccent),
+      trackColor: MaterialStatePropertyAll(Color(0x44FF1744)),
+    ),
+  );
 
   Color _getPrimaryColor() {
     switch (themeColor) {
@@ -65,28 +85,28 @@ class _MyAppState extends State<MyApp> {
       theme: isDarkMode ? _darkTheme : _lightTheme,
       initialRoute: '/login',
       routes: {
-        '/login': (context) => LoginScreen(isDarkMode: isDarkMode),
-        '/connect': (context) => ConnectScreen(isDarkMode: isDarkMode),
-        '/dashboard': (context) => DashBoard_Screen(isDarkMode: isDarkMode),
-        '/control': (context) => ControlPage(isDarkMode: isDarkMode),
-        '/analytics': (context) => AnalyticsScreen(isDarkMode: isDarkMode),
-        '/map': (context) => MapPage(isDarkMode: isDarkMode),
+        '/login': (context) => LoginScreen(),
+        '/connect': (context) => ConnectScreen(),
+        '/dashboard': (context) => DashBoard_Screen(),
+        '/control': (context) => ControlPage(),
+        '/analytics': (context) => AnalyticsScreen(),
+        '/map': (context) => MapPage(),
         '/settings': (context) => SettingsScreen(
-              isDarkMode: isDarkMode,
-              onThemeChanged: (val) {
-                setState(() {
-                  isDarkMode = val;
-                });
-              },
-              themeColor: themeColor,
-              onColorChanged: (color) {
-                setState(() {
-                  themeColor = color;
-                });
-              },
-            ),
+          isDarkMode: isDarkMode,
+          onThemeChanged: (val) {
+            setState(() {
+              isDarkMode = val;
+            });
+          },
+          themeColor: themeColor,
+          onColorChanged: (color) {
+            setState(() {
+              themeColor = color;
+            });
+          },
+        ),
       },
-      home: LoginScreen(isDarkMode: isDarkMode),
+      home: LoginScreen(),
     );
   }
 }

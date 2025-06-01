@@ -1,25 +1,20 @@
 import 'package:flutter/material.dart';
-// import 'dashboard_screen.dart'; // Import your dashboard screen
-import 'connect_screen.dart'; // Import your connect screen
+import 'connect_screen.dart';
 
 class LoginScreen extends StatelessWidget {
-  final bool isDarkMode; // Default value, can be set based on user preference
-  const LoginScreen({Key? key, required this.isDarkMode}) : super(key: key);
+  const LoginScreen({Key? key}) : super(key: key);
 
   void _goToConnectScreen(BuildContext context) {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => ConnectScreen(
-          isDarkMode: Theme.of(context).brightness == Brightness.dark,
-        ),
-      ),
+      MaterialPageRoute(builder: (context) => ConnectScreen()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       body: Center(
@@ -28,16 +23,13 @@ class LoginScreen extends StatelessWidget {
             children: [
               const SizedBox(height: 20),
               Container(
-                // width: 350, // REMOVE this line for dynamic width
                 padding: const EdgeInsets.symmetric(
                   vertical: 32,
                   horizontal: 24,
                 ),
                 decoration: BoxDecoration(
-                  color: Colors
-                      .transparent, // Change from Color(0xFFEFF4FB) to transparent
+                  color: Colors.transparent,
                   borderRadius: BorderRadius.circular(32),
-                  // Remove boxShadow to eliminate shadow/background effect
                 ),
                 child: Column(
                   children: [
@@ -45,34 +37,35 @@ class LoginScreen extends StatelessWidget {
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        gradient: const LinearGradient(
-                          colors: [Color(0xFF4F8CFF), Color(0xFF6F6CFF)],
+                        gradient: LinearGradient(
+                          colors: isDark
+                              ? [Colors.redAccent, Colors.red]
+                              : [
+                                  const Color(0xFF4F8CFF),
+                                  const Color(0xFF6F6CFF),
+                                ],
                           begin: Alignment.topLeft,
                           end: Alignment.bottomRight,
                         ),
                       ),
-                      child: const Icon(
-                        Icons.memory,
-                        size: 48,
-                        color: Colors.white,
-                      ),
+                      child: Icon(Icons.memory, size: 48, color: Colors.white),
                     ),
                     const SizedBox(height: 20),
-                    const Text(
+                    Text(
                       'AGV Control',
                       style: TextStyle(
                         fontSize: 28,
                         fontWeight: FontWeight.bold,
-                        color: Colors.black,
+                        color: theme.textTheme.bodyLarge?.color,
                         letterSpacing: 1.2,
                       ),
                     ),
                     const SizedBox(height: 4),
-                    const Text(
+                    Text(
                       'Map, Control, Navigate',
                       style: TextStyle(
                         fontSize: 15,
-                        color: Colors.black54,
+                        color: theme.textTheme.bodyMedium?.color,
                         fontWeight: FontWeight.w400,
                       ),
                     ),
@@ -80,71 +73,91 @@ class LoginScreen extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: theme.cardColor,
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             'Login',
                             style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.w600,
-                              color: Colors.black,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 16),
-                          const Text(
+                          Text(
                             'Username',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.black87,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 6),
                           TextField(
+                            style: TextStyle(
+                              color: theme.textTheme.bodyLarge?.color,
+                            ),
                             decoration: InputDecoration(
                               hintText: 'Enter your username',
+                              hintStyle: TextStyle(
+                                color: isDark ? Colors.white24 : Colors.black26,
+                              ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 12,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFE0E0E0),
+                                borderSide: BorderSide(
+                                  color: isDark
+                                      ? Colors.white24
+                                      : const Color(0xFFE0E0E0),
                                 ),
                               ),
                               filled: true,
-                              fillColor: const Color(0xFFF6F8FB),
+                              fillColor: isDark
+                                  ? const Color(0xFF181A20)
+                                  : const Color(0xFFF6F8FB),
                             ),
                           ),
                           const SizedBox(height: 14),
-                          const Text(
+                          Text(
                             'Password',
                             style: TextStyle(
                               fontSize: 14,
-                              color: Colors.black87,
+                              color: theme.textTheme.bodyLarge?.color,
                             ),
                           ),
                           const SizedBox(height: 6),
                           TextField(
                             obscureText: true,
+                            style: TextStyle(
+                              color: theme.textTheme.bodyLarge?.color,
+                            ),
                             decoration: InputDecoration(
                               hintText: 'Enter your password',
+                              hintStyle: TextStyle(
+                                color: isDark ? Colors.white24 : Colors.black26,
+                              ),
                               contentPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                                 vertical: 12,
                               ),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(8),
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFE0E0E0),
+                                borderSide: BorderSide(
+                                  color: isDark
+                                      ? Colors.white24
+                                      : const Color(0xFFE0E0E0),
                                 ),
                               ),
                               filled: true,
-                              fillColor: const Color(0xFFF6F8FB),
+                              fillColor: isDark
+                                  ? const Color(0xFF181A20)
+                                  : const Color(0xFFF6F8FB),
                             ),
                           ),
                           const SizedBox(height: 8),
@@ -157,10 +170,10 @@ class LoginScreen extends StatelessWidget {
                                 minimumSize: const Size(0, 0),
                                 tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                               ),
-                              child: const Text(
+                              child: Text(
                                 'Forgot password?',
                                 style: TextStyle(
-                                  color: Colors.blueAccent,
+                                  color: theme.primaryColor,
                                   fontSize: 13,
                                 ),
                               ),
@@ -178,7 +191,7 @@ class LoginScreen extends StatelessWidget {
                                 ),
                                 padding: EdgeInsets.zero,
                                 elevation: 0,
-                                backgroundColor: const Color(0xFF4F8CFF),
+                                backgroundColor: theme.primaryColor,
                                 foregroundColor: Colors.white,
                                 textStyle: const TextStyle(
                                   fontSize: 16,
@@ -194,15 +207,17 @@ class LoginScreen extends StatelessWidget {
                     const SizedBox(height: 18),
                     Row(
                       children: [
-                        Expanded(child: Divider(color: Colors.grey.shade400)),
-                        const Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 8),
+                        Expanded(child: Divider(color: theme.dividerColor)),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 8),
                           child: Text(
                             'or',
-                            style: TextStyle(color: Colors.black54),
+                            style: TextStyle(
+                              color: theme.textTheme.bodyMedium?.color,
+                            ),
                           ),
                         ),
-                        Expanded(child: Divider(color: Colors.grey.shade400)),
+                        Expanded(child: Divider(color: theme.dividerColor)),
                       ],
                     ),
                     const SizedBox(height: 18),
@@ -212,8 +227,8 @@ class LoginScreen extends StatelessWidget {
                       child: OutlinedButton(
                         onPressed: () => _goToConnectScreen(context),
                         style: OutlinedButton.styleFrom(
-                          side: const BorderSide(
-                            color: Color(0xFF4F8CFF),
+                          side: BorderSide(
+                            color: theme.primaryColor,
                             width: 1.5,
                           ),
                           shape: RoundedRectangleBorder(
@@ -224,9 +239,9 @@ class LoginScreen extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        child: const Text(
+                        child: Text(
                           'Continue as Guest',
-                          style: TextStyle(color: Color(0xFF4F8CFF)),
+                          style: TextStyle(color: theme.primaryColor),
                         ),
                       ),
                     ),
@@ -234,16 +249,19 @@ class LoginScreen extends StatelessWidget {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Text(
+                        Text(
                           'New to AGV Control? ',
-                          style: TextStyle(color: Colors.black54, fontSize: 13),
+                          style: TextStyle(
+                            color: theme.textTheme.bodyMedium?.color,
+                            fontSize: 13,
+                          ),
                         ),
                         GestureDetector(
                           onTap: () {},
-                          child: const Text(
+                          child: Text(
                             'Sign up',
                             style: TextStyle(
-                              color: Color(0xFF4F8CFF),
+                              color: theme.primaryColor,
                               fontWeight: FontWeight.bold,
                               fontSize: 13,
                               decoration: TextDecoration.underline,
