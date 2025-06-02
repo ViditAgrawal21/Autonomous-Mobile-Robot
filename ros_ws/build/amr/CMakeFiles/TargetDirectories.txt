@@ -1,9 +1,0 @@
-/home/nikhil/Work/technowings/fleet-management-system/ros_ws/build/amr/CMakeFiles/uninstall.dir
-/home/nikhil/Work/technowings/fleet-management-system/ros_ws/build/amr/CMakeFiles/amr_uninstall.dir
-/home/nikhil/Work/technowings/fleet-management-system/ros_ws/build/amr/CMakeFiles/test.dir
-/home/nikhil/Work/technowings/fleet-management-system/ros_ws/build/amr/CMakeFiles/edit_cache.dir
-/home/nikhil/Work/technowings/fleet-management-system/ros_ws/build/amr/CMakeFiles/rebuild_cache.dir
-/home/nikhil/Work/technowings/fleet-management-system/ros_ws/build/amr/CMakeFiles/list_install_components.dir
-/home/nikhil/Work/technowings/fleet-management-system/ros_ws/build/amr/CMakeFiles/install.dir
-/home/nikhil/Work/technowings/fleet-management-system/ros_ws/build/amr/CMakeFiles/install/local.dir
-/home/nikhil/Work/technowings/fleet-management-system/ros_ws/build/amr/CMakeFiles/install/strip.dir
