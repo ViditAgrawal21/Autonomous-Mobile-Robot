@@ -71,6 +71,7 @@
                                 xyz="0 0 0" rpy="0 0 0" />
     </link>
 
+    <!-- macro for defining castor wheel links -->
     <xacro:macro name="castor_wheel_link" params="prefix">
         <link name="${prefix}_castor_wheel_link">    <!-- set second link name -->
             <visual>
@@ -98,29 +99,30 @@
 
 
     <!-- robot joints -->
-     
-    <joint name="footprint_base_joint" type="fixed">     <!-- set joint name and type-->
+
+    <joint name="footprint_base_joint" type="fixed">
         <parent link="base_footprint" />
         <child link="base_link" />
         <origin xyz="0 0 ${wheel_radius + 0.097}" rpy="0 0 0" />
     </joint>
 
-    <joint name="base_right_wheel_joint" type="continuous">     <!-- set joint name and type-->
+    <joint name="base_right_wheel_joint" type="continuous">
         <parent link="base_link" />
         <child link="left_wheel_link" />
         <origin xyz="0 -0.27 -0.097" rpy="${pi / 2} 0 0" />
         <axis xyz="0 0 -1" />
     </joint>
 
-    <joint name="base_left_wheel_joint" type="continuous">     <!-- set joint name and type-->
+    <joint name="base_left_wheel_joint" type="continuous">
         <parent link="base_link" />
         <child link="right_wheel_link" />
         <origin xyz="0 0.27 -0.097" rpy="${pi / 2} 0 0" />
         <axis xyz="0 0 -1" />
     </joint>
 
+    <!-- macro for defining castor wheel joints -->
     <xacro:macro name="castor_wheel_joint" params="prefix parent child xyz rpy axis">
-        <joint name="${prefix}_joint" type="fixed">     <!-- set joint name and type-->
+        <joint name="${prefix}_joint" type="fixed">
             <parent link="${parent}" />
             <child link="${child}" />
             <origin xyz="${xyz}" rpy="${rpy}" />
