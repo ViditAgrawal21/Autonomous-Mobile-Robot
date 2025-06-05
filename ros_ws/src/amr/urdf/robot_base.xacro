@@ -19,8 +19,8 @@
     <link name="base_link" >
         <visual>
             <geometry>
-                <!-- <box size="${base_length} ${base_width} ${base_height}" /> -->
-                <mesh filename="package://amr/meshes/base_link.stl" scale="0.001 0.001 0.001" />
+                <box size="${base_length} ${base_width} ${base_height}" />
+                <!-- <mesh filename="package://amr/meshes/base_link.stl" scale="0.001 0.001 0.001" /> -->
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
             <material name="blue" />
@@ -41,7 +41,7 @@
                 <cylinder radius="${wheel_radius}" length="${wheel_length}" />     <!-- set size -->
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
-            <material name="grey" />
+            <material name="red" />
         </visual>
         <collision>
             <geometry>
@@ -59,7 +59,7 @@
                 <cylinder radius="${wheel_radius}" length="${wheel_length}" />     <!-- set size -->
             </geometry>
             <origin xyz="0 0 0" rpy="0 0 0" />
-            <material name="grey" />
+            <material name="red" />
         </visual>
         <collision>
             <geometry>
