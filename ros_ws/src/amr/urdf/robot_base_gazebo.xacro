@@ -59,7 +59,7 @@
             filename="gz-sim-joint-state-publisher-system" name="gz::sim::systems::JointStatePublisher">
             <left_joint>base_left_wheel_joint</left_joint>
             <right_joint>base_right_wheel_joint</right_joint>
-    </plugin>
+        </plugin>
     </gazebo>
 
 </robot>
