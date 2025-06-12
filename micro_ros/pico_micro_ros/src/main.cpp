@@ -15,14 +15,19 @@
 #error This example is only avaliable for Arduino framework with serial transport.
 #endif
 
-#define LPWM 17
-#define LDir 16
-#define RPWM 19
-#define RDir 18
+#define LPWM 0
+#define LDir 2
+#define RPWM 1
+#define RDir 3
 
+#define ENCODER_0_PIN_A 18
+#define ENCODER_0_PIN_B 19
+#define ENCODER_1_PIN_A 20
+#define ENCODER_1_PIN_B 21
 
-// Encoder enc1(6,7);
-// Encoder enc2(8,9);
+volatile int32_t encoder_count[2] = {0};
+volatile bool last_A0 = 0;
+volatile bool last_A1 = 0;
 
 rcl_publisher_t encoder_readings_pub_;
 rcl_publisher_t check_pub_;
@@ -46,6 +51,9 @@ rcl_timer_t check_timer;
 float linear_vel;
 float angular_vel;
 float pid_values[4] = {0};
+float pwm_limit = 50; // Max PWM value for motors
+bool l_dir = LOW;  //direction flag for left motor
+bool r_dir = LOW;  //direction flag for right motor
 
 float v1 = 0, v2 = 0;
 
@@ -106,45 +114,61 @@ void pid_callback(const void * msgin)
   pid_values[3] = msg->data.data[3];
 }
 
+void encoder_callback_0() {
+    bool A = digitalRead(ENCODER_0_PIN_A);
+    bool B = digitalRead(ENCODER_0_PIN_B);
+
+    if (A != last_A0) {
+        if (A == B) {
+            encoder_count[0]++;
+        } else {
+            encoder_count[0]--;
+        }
+        last_A0 = A;
+    }
+}
+
+void encoder_callback_1() {
+    bool A = digitalRead(ENCODER_1_PIN_A);
+    bool B = digitalRead(ENCODER_1_PIN_B);
+
+    if (A != last_A1) {
+        if (A == B) {
+            encoder_count[1]++;
+        } else {
+            encoder_count[1]--;
+        }
+        last_A1 = A;
+    }
+}
+
 void encoderReadings(){
-  // encoder_readings_.data.data[0] = enc1.read();
-  // encoder_readings_.data.data[1] = enc2.read();
+  encoder_readings_.data.data[0] = encoder_count[0];
+  encoder_readings_.data.data[1] = encoder_count[1];
 }
 
 void moveMotors(){
-      v1 = 2 * (linear_vel + angular_vel);
-      v2 = 2 * (linear_vel - angular_vel);
+      v1 = (linear_vel + angular_vel);
+      v2 = (linear_vel - angular_vel);
     
-  if(v1 > 50){
-    v1 = 50;
-  }
-  else if(v1 < -50){
-    v1 = -50;
-  }
-  if(v2 > 50){
-    v2 = 50;
-  }
-  else if(v2 < -50){
-    v2 = -50;
-  }
+  constrain(v1, -pwm_limit, pwm_limit);
+  constrain(v2, -pwm_limit, pwm_limit);
 
-  if(v1 > 0){
-    digitalWrite(LDir, LOW);
-    analogWrite(LPWM, v1);
-  }
-  else{
-    digitalWrite(LDir, HIGH);
-    analogWrite(LPWM, abs(v1));
-  }
+  if(v1 > 0)
+    l_dir = LOW;
+  else
+    l_dir = HIGH;
 
-  if(v2 > 0){
-    digitalWrite(RDir, LOW);
-    analogWrite(RPWM, v2);
-  }
-  else{
-    digitalWrite(RDir, HIGH);
-    analogWrite(RPWM, abs(v2));
-  }
+  if(v2 > 0)
+    r_dir = LOW;
+  else
+    r_dir = HIGH;
+
+  digitalWrite(LDir, l_dir);
+  analogWrite(LPWM, v1);
+
+  digitalWrite(RDir, r_dir);
+  analogWrite(RPWM, v2);
 }
 
 void setup() {
@@ -152,6 +176,14 @@ void setup() {
   Serial.begin(115200);
   set_microros_serial_transports(Serial);
   delay(2000);
+
+  pinMode(ENCODER_0_PIN_A, INPUT_PULLUP);
+  pinMode(ENCODER_0_PIN_B, INPUT_PULLUP);
+  pinMode(ENCODER_1_PIN_A, INPUT_PULLUP);
+  pinMode(ENCODER_1_PIN_B, INPUT_PULLUP);
+
+  attachInterrupt(digitalPinToInterrupt(ENCODER_0_PIN_A), encoder_callback_0, CHANGE);
+  attachInterrupt(digitalPinToInterrupt(ENCODER_1_PIN_A), encoder_callback_1, CHANGE);
 
   pinMode(LPWM, OUTPUT);
   pinMode(RPWM, OUTPUT);
