@@ -166,10 +166,10 @@ void moveMotors(){
     r_dir = HIGH;
 
   digitalWrite(LDir, l_dir);
-  analogWrite(LPWM, v1);
+  analogWrite(LPWM, abs(v1));
 
   digitalWrite(RDir, r_dir);
-  analogWrite(RPWM, v2);
+  analogWrite(RPWM, abs(v2));
 }
 
 void setup() {
