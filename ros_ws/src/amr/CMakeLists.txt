@@ -7,9 +7,14 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(rclcpp REQUIRED)
+find_package(geometry_msgs REQUIRED)
 # uncomment the following section in order to fill in
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
+
+add_executable(twist_to_stamped hardware/twist_to_stamped.cpp)   #"cpp_node" name of executable
+ament_target_dependencies(twist_to_stamped rclcpp geometry_msgs)         #these two lines create an executable but not install it
 
 if(BUILD_TESTING)
   find_package(ament_lint_auto REQUIRED)
@@ -24,8 +29,13 @@ if(BUILD_TESTING)
 endif()
 
 install(
-  DIRECTORY launch urdf rviz config                   #directory which needs to be installed
+  DIRECTORY launch urdf rviz config hardware                  #directory which needs to be installed
   DESTINATION share/${PROJECT_NAME}/      #directory where it will be installed
+)
+
+install(TARGETS            #installs the executable
+  twist_to_stamped
+  DESTINATION lib/${PROJECT_NAME}
 )
 
 ament_package()

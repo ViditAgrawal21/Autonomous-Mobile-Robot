@@ -1,6 +1,7 @@
 #include <Arduino.h>
 // #include <Encoder.h>
 #include <micro_ros_platformio.h>
+#include <rmw_microros/rmw_microros.h>
 
 #include <rcl/rcl.h>
 #include <rclc/rclc.h>
@@ -189,6 +190,18 @@ void setup() {
   pinMode(RPWM, OUTPUT);
   pinMode(LDir, OUTPUT);
   pinMode(RDir, OUTPUT);
+
+  // Wait for agent successful ping for 5 minutes.
+  const int timeout_ms = 1000; 
+  const uint8_t attempts = 300;
+
+  rcl_ret_t ret = rmw_uros_ping_agent(timeout_ms, attempts);
+
+  if (ret != RCL_RET_OK)
+  {
+      // Unreachable agent, exiting program.
+      while(1);
+  }
 
   allocator = rcl_get_default_allocator();
 

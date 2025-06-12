@@ -19,9 +19,15 @@ from launch.substitutions import Command, FindExecutable, PathJoinSubstitution
 
 from launch_ros.actions import Node
 from launch_ros.substitutions import FindPackageShare
+import os
+from ament_index_python.packages import get_package_share_directory
+from launch.actions import ExecuteProcess
 
 
 def generate_launch_description():
+
+    joy_params = os.path.join(get_package_share_directory('amr'),'config','joystick.yaml')
+
     # Get URDF via xacro
     robot_description_content = Command(
         [
@@ -80,6 +86,26 @@ def generate_launch_description():
         arguments=["diff_drive_controller", "--controller-manager", "/controller_manager"],
     )
 
+    joy_node = Node(
+            package='joy',
+            executable='joy_node',
+            parameters=[joy_params],
+         )
+
+    teleop_node = Node(
+            package='teleop_twist_joy',
+            executable='teleop_node',
+            name='teleop_node',
+            parameters=[joy_params],
+            remappings=[('/cmd_vel','/twist_vel')]
+         )
+    
+    twist_to_stamped_node = Node(
+            package='amr',
+            executable='twist_to_stamped',
+            name='twist_to_stamped',
+         )
+
     #Delay joint_state_broadcaster_spawner until `ros2_control_node` is ready
     delay_joint_state_broadcaster_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -104,6 +130,14 @@ def generate_launch_description():
         )
     )
 
+    micro_ros_agent_process = ExecuteProcess(
+        cmd=[
+            'ros2', 'run', 'micro_ros_agent', 'micro_ros_agent', 'serial',
+            '--dev', '/dev/ttyACM0'
+        ],
+        output='screen'
+    )
+
     nodes = [
         control_node,
         robot_state_pub_node,
@@ -111,6 +145,9 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
+        joy_node,
+        teleop_node,
+        twist_to_stamped_node,micro_ros_agent_process,
     ]
 
     return LaunchDescription(nodes)
