@@ -50,6 +50,8 @@
 
         <frame_id>odom</frame_id>
         <child_frame_id>base_footprint</child_frame_id>
+        <odom_topic>odom</odom_topic>
+        
 
         </plugin>
     </gazebo>

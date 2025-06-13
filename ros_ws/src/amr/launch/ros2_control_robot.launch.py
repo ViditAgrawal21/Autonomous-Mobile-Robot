@@ -49,7 +49,7 @@ def generate_launch_description():
     )
 
     rviz_config_file = PathJoinSubstitution(
-        [FindPackageShare("amr"), "rviz", "urdf_config.rviz"]
+        [FindPackageShare("amr"), "rviz", "slam_config.rviz"]
     )
 
     control_node = Node(
@@ -105,6 +105,18 @@ def generate_launch_description():
             executable='twist_to_stamped',
             name='twist_to_stamped',
          )
+    
+    lidar_node = Node(
+            package='rplidar_ros',
+            executable='rplidar_composition',
+            output='screen',
+            parameters=[{
+                'serial_port': '/dev/ttyUSB0',
+                'frame_id': 'laser_frame',
+                'angle_compensate': True,
+                'scan_mode': 'Standard'
+            }]
+        )
 
     #Delay joint_state_broadcaster_spawner until `ros2_control_node` is ready
     delay_joint_state_broadcaster_spawner = RegisterEventHandler(
@@ -147,7 +159,9 @@ def generate_launch_description():
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
         joy_node,
         teleop_node,
-        twist_to_stamped_node,micro_ros_agent_process,
+        twist_to_stamped_node,
+        # micro_ros_agent_process,
+        lidar_node,
     ]
 
     return LaunchDescription(nodes)
