@@ -155,13 +155,13 @@ def generate_launch_description():
         robot_state_pub_node,
         delay_joint_state_broadcaster_spawner,
         joint_state_broadcaster_spawner,
-        delay_rviz_after_joint_state_broadcaster_spawner,
+        # delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
         joy_node,
         teleop_node,
         twist_to_stamped_node,
-        # micro_ros_agent_process,
-        lidar_node,
+        micro_ros_agent_process,
+        # lidar_node,
     ]
 
     return LaunchDescription(nodes)
