@@ -161,7 +161,7 @@ def generate_launch_description():
         teleop_node,
         twist_to_stamped_node,
         micro_ros_agent_process,
-        lidar_node,
+        # lidar_node,
     ]
 
     return LaunchDescription(nodes)
