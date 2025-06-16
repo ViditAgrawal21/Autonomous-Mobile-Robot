@@ -149,8 +149,8 @@ void encoderReadings(){
 }
 
 void moveMotors(){
-      v1 = (linear_vel + angular_vel);
-      v2 = (linear_vel - angular_vel);
+      v1 = (linear_vel - angular_vel);
+      v2 = (linear_vel + angular_vel);
     
   constrain(v1, -pwm_limit, pwm_limit);
   constrain(v2, -pwm_limit, pwm_limit);
@@ -240,7 +240,7 @@ void setup() {
     "set_pid"));
 
   // create timer,
-  const unsigned int timer_timeout = 1000;
+  const unsigned int timer_timeout = 10;
   RCCHECK(rclc_timer_init_default(
     &encoder_readings_timer,
     &support,
