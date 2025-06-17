@@ -100,11 +100,12 @@
 
     <!-- robot joints -->
 
-    <joint name="footprint_base_joint" type="fixed">
+    <joint name="footprint_base_jont" type="fixed">
         <parent link="base_footprint" />
         <child link="base_link" />
         <origin xyz="0 0 ${wheel_radius + 0.097}" rpy="0 0 0" />
     </joint>
+
 
     <joint name="base_right_wheel_joint" type="continuous">
         <parent link="base_link" />

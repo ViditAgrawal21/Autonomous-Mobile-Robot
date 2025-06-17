@@ -9,7 +9,7 @@ public:
     : Node("twist_to_stamped")
     {
         twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
-            "/twist_vel", 10,
+            "/cmd_vel", 10,
             std::bind(&TwistToStampedNode::twist_callback, this, std::placeholders::_1));
 
         twist_stamped_pub_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(
@@ -22,7 +22,9 @@ private:
         geometry_msgs::msg::TwistStamped stamped_msg;
         stamped_msg.header.stamp = this->get_clock()->now();
         stamped_msg.header.frame_id = "base_footprint";  // Change as needed
-        stamped_msg.twist = *msg;
+        // stamped_msg.twist = *msg;
+        stamped_msg.twist.linear.x = 20 * msg->linear.x;
+        stamped_msg.twist.angular.z = 7 * msg->angular.z;
 
         twist_stamped_pub_->publish(stamped_msg);
     }

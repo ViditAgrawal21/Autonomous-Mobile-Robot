@@ -97,7 +97,7 @@ def generate_launch_description():
             executable='teleop_node',
             name='teleop_node',
             parameters=[joy_params],
-            remappings=[('/cmd_vel','/twist_vel')]
+            # remappings=[('/cmd_vel','/twist_vel')]
          )
     
     twist_to_stamped_node = Node(
@@ -161,7 +161,7 @@ def generate_launch_description():
         teleop_node,
         twist_to_stamped_node,
         micro_ros_agent_process,
-        # lidar_node,
+        lidar_node,
     ]
 
     return LaunchDescription(nodes)
