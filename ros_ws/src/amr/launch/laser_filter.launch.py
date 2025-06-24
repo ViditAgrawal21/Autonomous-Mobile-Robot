@@ -14,9 +14,5 @@ def generate_launch_description():
                     get_package_share_directory("amr"),
                     "config", "scan_filter.yaml",
                 ])],
-            remappings=[
-                ('scan', '/rplidar/scan'),       # input
-                ('scan_filtered', '/scan')       # output used by Nav2
-            ],
         )
     ])
