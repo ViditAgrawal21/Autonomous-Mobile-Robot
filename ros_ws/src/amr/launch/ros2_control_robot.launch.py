@@ -126,7 +126,7 @@ def generate_launch_description():
         )
     )
 
-    # Delay rviz start after `joint_state_broadcaster`
+    # Delay rviz start after `joint_state_broadcaster
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(
             target_action=joint_state_broadcaster_spawner,

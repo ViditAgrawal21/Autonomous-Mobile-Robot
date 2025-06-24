@@ -9,16 +9,20 @@ teleop_node:
     axis_linear:
       x: 1
     scale_linear:
-      x: 3.0
+      x: 1.0
+      # x: 3.0
     scale_linear_turbo:
-      x: 6.0
+      x: 2.0
+      # x: 6.0
 
     axis_angular:
       yaw: 0
     scale_angular:
-      yaw: 3.0
+      yaw: 1.0
+      # yaw: 3.0
     scale_angular_turbo:
-      yaw: 6.0
+      yaw: 2.0
+      # yaw: 6.0
 
 
     enable_button: 4

@@ -1,5 +1,4 @@
 #include <Arduino.h>
-// #include <Encoder.h>
 #include <micro_ros_platformio.h>
 #include <rmw_microros/rmw_microros.h>
 

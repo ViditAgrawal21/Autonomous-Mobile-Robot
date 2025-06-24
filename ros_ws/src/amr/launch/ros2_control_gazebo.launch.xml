@@ -23,6 +23,8 @@
         <param name="config_file" value="$(var gazebo_config)" />
     </node>
 
+    <node pkg="amr" exec="twist_to_stamped"  />
+
     <node pkg="rviz2" exec="rviz2" output="screen" args="-d $(var rviz_config)"/>
 
     <node pkg="controller_manager" exec="spawner"
