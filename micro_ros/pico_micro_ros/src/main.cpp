@@ -1,4 +1,5 @@
 #include <Arduino.h>
+#include <Cytron.h>
 #include <micro_ros_platformio.h>
 #include <rmw_microros/rmw_microros.h>
 
@@ -25,6 +26,9 @@
 #define ENCODER_1_PIN_A 20
 #define ENCODER_1_PIN_B 21
 
+Cytron leftMotor(LPWM, LDir, LOW);
+Cytron rightMotor(RPWM, RDir, LOW);
+
 volatile int32_t encoder_count[2] = {0};
 volatile bool last_A0 = 0;
 volatile bool last_A1 = 0;
@@ -37,7 +41,7 @@ rcl_subscription_t pid_values_sub_;
 
 std_msgs__msg__Float32MultiArray encoder_readings_;
 std_msgs__msg__Bool check_;
-geometry_msgs__msg__Twist wheel_vel_;
+std_msgs__msg__Float32MultiArray wheel_vel_;
 std_msgs__msg__Float32MultiArray pid_values_;
 
 rclc_executor_t executor;
@@ -48,10 +52,11 @@ rcl_node_t mc_node;
 rcl_timer_t encoder_readings_timer;
 rcl_timer_t check_timer;
 
-float linear_vel;
-float angular_vel;
 float pid_values[4] = {0};
-float pwm_limit = 50; // Max PWM value for motors
+float pwm_limit = 100; // Max PWM value for motors
+float min_pwm = 15; // Minimum PWM value
+float v = min_pwm;
+float mul = 1; // multiplier
 bool l_dir = LOW;  //direction flag for left motor
 bool r_dir = LOW;  //direction flag for right motor
 
@@ -86,14 +91,14 @@ void wheel_vel_callback(const void * msgin)
   if(msgin == NULL){
     return;
   }
-  const geometry_msgs__msg__Twist * msg = (const geometry_msgs__msg__Twist *)msgin;
+  const std_msgs__msg__Float32MultiArray * msg = (const std_msgs__msg__Float32MultiArray *)msgin;
 
-  if(isnan(msg->linear.x) || isnan(msg->angular.z)){
+  if((msg->data.data == NULL) || (msg->data.size < 2)){
     return;
   }
 
-  linear_vel = msg->linear.x;
-  angular_vel = msg->angular.z;
+  v1 = msg->data.data[0];
+  v2 = msg->data.data[1];
 }
 
 void pid_callback(const void * msgin)
@@ -148,27 +153,42 @@ void encoderReadings(){
 }
 
 void moveMotors(){
-      v1 = (linear_vel - angular_vel);
-      v2 = (linear_vel + angular_vel);
-    
+
+  float temp_v1 = abs(v1);
+  float temp_v2 = abs(v2);
+  
+  if(temp_v1 < temp_v2){
+    if(temp_v1 < min_pwm)
+      v = temp_v1;
+    else
+      v = min_pwm;
+  }
+  else if(temp_v2 < temp_v1){
+    if(temp_v2 < min_pwm)
+      v = temp_v2;
+    else
+      v = min_pwm;
+  }
+
+  temp_v1 = abs(temp_v1) + (min_pwm - v);
+  temp_v2 = abs(temp_v2) + (min_pwm - v);
+
+  if(v1 < 0)
+    v1 = -temp_v1;
+  else
+    v1 = temp_v1;
+
+  if(v2 < 0)
+    v2 = -temp_v2;
+  else
+    v2 = temp_v2;
+
   constrain(v1, -pwm_limit, pwm_limit);
   constrain(v2, -pwm_limit, pwm_limit);
 
-  if(v1 > 0)
-    l_dir = LOW;
-  else
-    l_dir = HIGH;
+  leftMotor.rotate(v1);
+  rightMotor.rotate(v2);
 
-  if(v2 > 0)
-    r_dir = LOW;
-  else
-    r_dir = HIGH;
-
-  digitalWrite(LDir, l_dir);
-  analogWrite(LPWM, abs(v1));
-
-  digitalWrite(RDir, r_dir);
-  analogWrite(RPWM, abs(v2));
 }
 
 void setup() {
@@ -184,11 +204,6 @@ void setup() {
 
   attachInterrupt(digitalPinToInterrupt(ENCODER_0_PIN_A), encoder_callback_0, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_1_PIN_A), encoder_callback_1, CHANGE);
-
-  pinMode(LPWM, OUTPUT);
-  pinMode(RPWM, OUTPUT);
-  pinMode(LDir, OUTPUT);
-  pinMode(RDir, OUTPUT);
 
   // Wait for agent successful ping for 5 minutes.
   const int timeout_ms = 1000; 
@@ -228,7 +243,7 @@ void setup() {
   RCCHECK(rclc_subscription_init_default(
     &wheel_vel_sub_,
     &mc_node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(geometry_msgs, msg, Twist),
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
     "cmd_vel"));
       
   // create subscriber
@@ -270,8 +285,14 @@ void setup() {
   encoder_readings_.data.data[1] = 0;
 
   check_.data = true;
-  wheel_vel_ = {};
-  // pid_values_ = { .data = { .data = NULL, .size = 0, .capacity = 0}};
+  
+  wheel_vel_.data.size = 2;
+  wheel_vel_.data.capacity = 2;
+  wheel_vel_.data.data = (float*) malloc(2 * sizeof(float));
+
+  wheel_vel_.data.data[0] = 0;
+  wheel_vel_.data.data[1] = 0;
+
   pid_values_.data.size = 4;
   pid_values_.data.capacity = 4;
   pid_values_.data.data = (float*) malloc(4 * sizeof(float));
