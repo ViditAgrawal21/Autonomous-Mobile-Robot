@@ -22,12 +22,9 @@ private:
         geometry_msgs::msg::TwistStamped stamped_msg;
         stamped_msg.header.stamp = this->get_clock()->now();
         stamped_msg.header.frame_id = "base_footprint";  // Change as needed
-        // stamped_msg.twist = *msg;
-        stamped_msg.twist.linear.x = msg->linear.x;
-        stamped_msg.twist.angular.z = msg->angular.z;
 
-        // stamped_msg.twist.linear.x = 20 * msg->linear.x;
-        // stamped_msg.twist.angular.z = 15 * msg->angular.z;
+        stamped_msg.twist.linear.x = 15 * msg->linear.x;
+        stamped_msg.twist.angular.z = 60 * msg->angular.z;
 
         twist_stamped_pub_->publish(stamped_msg);
     }
