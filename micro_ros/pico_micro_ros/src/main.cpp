@@ -11,6 +11,9 @@
 #include <std_msgs/msg/float32_multi_array.h>
 #include <std_msgs/msg/bool.h>
 #include <geometry_msgs/msg/twist.h>
+#include <sensor_msgs/msg/range.h>
+#include <rmw_microros/time_sync.h>
+#include <builtin_interfaces/msg/time.h>
 
 #if !defined(MICRO_ROS_TRANSPORT_ARDUINO_SERIAL)
 #error This example is only avaliable for Arduino framework with serial transport.
@@ -26,6 +29,9 @@
 #define ENCODER_1_PIN_A 20
 #define ENCODER_1_PIN_B 21
 
+#define ECHOPIN 7// Pin to receive echo pulse
+#define TRIGPIN 8// Pin to send trigger pulse
+
 Cytron leftMotor(LPWM, LDir, LOW);
 Cytron rightMotor(RPWM, RDir, LOW);
 
@@ -35,6 +41,7 @@ volatile bool last_A1 = 0;
 
 rcl_publisher_t encoder_readings_pub_;
 rcl_publisher_t check_pub_;
+rcl_publisher_t ultrsonic_sensor_pub_;
 
 rcl_subscription_t wheel_vel_sub_;
 rcl_subscription_t pid_values_sub_;
@@ -43,14 +50,17 @@ std_msgs__msg__Float32MultiArray encoder_readings_;
 std_msgs__msg__Bool check_;
 std_msgs__msg__Float32MultiArray wheel_vel_;
 std_msgs__msg__Float32MultiArray pid_values_;
+sensor_msgs__msg__Range ultrasonic_sensor_;
 
 rclc_executor_t executor;
 rclc_support_t support;
 rcl_allocator_t allocator;
 
 rcl_node_t mc_node;
+
 rcl_timer_t encoder_readings_timer;
 rcl_timer_t check_timer;
+rcl_timer_t ultrasonic_readings_timer;
 
 float pid_values[4] = {0};
 float pwm_limit = 100; // Max PWM value for motors
@@ -61,6 +71,8 @@ bool l_dir = LOW;  //direction flag for left motor
 bool r_dir = LOW;  //direction flag for right motor
 
 float v1 = 0, v2 = 0;
+
+float distance = 0;;
 
 #define RCCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){error_loop();}}
 #define RCSOFTCHECK(fn) { rcl_ret_t temp_rc = fn; if((temp_rc != RCL_RET_OK)){}}
@@ -83,6 +95,13 @@ void check_callback(rcl_timer_t * timer, int64_t last_call_time) {
   RCLC_UNUSED(last_call_time);
   if (timer != NULL) {
     RCSOFTCHECK(rcl_publish(&check_pub_, &check_, NULL));
+  }
+}
+
+void ultrasonic_readings_callback(rcl_timer_t * timer, int64_t last_call_time) {
+  RCLC_UNUSED(last_call_time);
+  if (timer != NULL) {
+    RCSOFTCHECK(rcl_publish(&ultrsonic_sensor_pub_, &ultrasonic_sensor_, NULL));
   }
 }
 
@@ -147,6 +166,28 @@ void encoder_callback_1() {
     }
 }
 
+void ultrasonic_sensor_data() {
+
+  digitalWrite(TRIGPIN, LOW); // Set the trigger pin to low for 2uS
+  delayMicroseconds(2);
+  digitalWrite(TRIGPIN, HIGH); // Send a 10uS high to trigger ranging
+  delayMicroseconds(20);
+  digitalWrite(TRIGPIN, LOW); // Send pin low again
+  distance = pulseIn(ECHOPIN, HIGH)/58; // Read in times pulse
+
+  // Simulated ultrasonic sensor data
+  builtin_interfaces__msg__Time now;
+  uint64_t time_ms = rmw_uros_epoch_millis();
+  now.sec = time_ms / 1000;
+  now.nanosec = (time_ms % 1000) * 1000000;
+  ultrasonic_sensor_.header.stamp = now;
+  ultrasonic_sensor_.radiation_type = sensor_msgs__msg__Range__ULTRASOUND;
+  ultrasonic_sensor_.field_of_view = 2.1; // Example field of view in radians
+  ultrasonic_sensor_.min_range = 0.25; // Minimum range in meters
+  ultrasonic_sensor_.max_range = 4.0; // Maximum range in meters
+  ultrasonic_sensor_.range = distance; // Example range value in meters
+}
+
 void encoderReadings(){
   encoder_readings_.data.data[0] = encoder_count[0];
   encoder_readings_.data.data[1] = encoder_count[1];
@@ -183,8 +224,21 @@ void moveMotors(){
   else
     v2 = temp_v2;
 
-  constrain(v1, -pwm_limit, pwm_limit);
-  constrain(v2, -pwm_limit, pwm_limit);
+  // constrain(v1, -pwm_limit, pwm_limit);
+  // constrain(v2, -pwm_limit, pwm_limit);
+
+  if(v1 > pwm_limit){
+    v1 = 100;
+  }
+  else if(v1 < -pwm_limit){
+    v1 = -100;
+  }
+  if(v2 > pwm_limit){
+    v2 = 100;
+  }
+  else if(v2 < -pwm_limit){
+    v2 = -100;
+  }
 
   leftMotor.rotate(v1);
   rightMotor.rotate(v2);
@@ -202,6 +256,9 @@ void setup() {
   pinMode(ENCODER_1_PIN_A, INPUT_PULLUP);
   pinMode(ENCODER_1_PIN_B, INPUT_PULLUP);
 
+  pinMode(ECHOPIN, INPUT);
+  pinMode(TRIGPIN, OUTPUT);
+
   attachInterrupt(digitalPinToInterrupt(ENCODER_0_PIN_A), encoder_callback_0, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_1_PIN_A), encoder_callback_1, CHANGE);
 
@@ -216,6 +273,8 @@ void setup() {
       // Unreachable agent, exiting program.
       while(1);
   }
+
+  rmw_uros_sync_session(10);  // syncs every 10 seconds
 
   allocator = rcl_get_default_allocator();
 
@@ -269,10 +328,20 @@ void setup() {
     RCL_MS_TO_NS(timer_timeout1),
     check_callback));
 
+  // create timer,
+  const unsigned int ultrasonic_timer_timeout = 10;
+  RCCHECK(rclc_timer_init_default(
+    &ultrasonic_readings_timer,
+    &support,
+    RCL_MS_TO_NS(ultrasonic_timer_timeout),
+    ultrasonic_readings_callback));
+
   // create executor
   RCCHECK(rclc_executor_init(&executor, &support.context, 4, &allocator));
   RCCHECK(rclc_executor_add_timer(&executor, &encoder_readings_timer));
   RCCHECK(rclc_executor_add_timer(&executor, &check_timer));
+  RCCHECK(rclc_executor_add_timer(&executor, &ultrasonic_readings_timer));
+  
   RCCHECK(rclc_executor_add_subscription(&executor, &wheel_vel_sub_, &wheel_vel_, &wheel_vel_callback, ON_NEW_DATA));
   RCCHECK(rclc_executor_add_subscription(&executor, &pid_values_sub_, &pid_values_, &pid_callback, ON_NEW_DATA));
 
@@ -307,6 +376,7 @@ void setup() {
 void loop() {
   // delay(100);
   encoderReadings();
+  ultrasonic_sensor_data();
   moveMotors();
   RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1)));
 }
