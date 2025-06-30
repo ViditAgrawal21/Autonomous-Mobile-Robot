@@ -13,8 +13,6 @@
 #include <std_msgs/msg/bool.h>
 #include <geometry_msgs/msg/twist.h>
 #include <sensor_msgs/msg/range.h>
-#include <rmw_microros/time_sync.h>
-#include <builtin_interfaces/msg/time.h>
 #include "rosidl_runtime_c/string_functions.h"
 
 #if !defined(MICRO_ROS_TRANSPORT_ARDUINO_SERIAL)
@@ -52,7 +50,7 @@ std_msgs__msg__Float32MultiArray encoder_readings_;
 std_msgs__msg__Bool check_;
 std_msgs__msg__Float32MultiArray wheel_vel_;
 std_msgs__msg__Float32MultiArray pid_values_;
-sensor_msgs__msg__Range ultrasonic_sensor_;
+std_msgs__msg__Float32MultiArray ultrasonic_sensor_;
 
 rclc_executor_t executor;
 rclc_support_t support;
@@ -177,20 +175,7 @@ void ultrasonic_sensor_data() {
   digitalWrite(TRIGPIN, LOW); // Send pin low again
   distance = pulseIn(ECHOPIN, HIGH)/58; // Read in times pulse
 
-  distance = distance / 100.0; // Convert to meters
-  // Simulated ultrasonic sensor data
-  builtin_interfaces__msg__Time now;
-  uint64_t time_ms = rmw_uros_epoch_millis();
-  now.sec = time_ms / 1000;
-  now.nanosec = (time_ms % 1000) * 1000000;
-  ultrasonic_sensor_.header.stamp = now;
-  rclc_clock_get_now(&clock, &ultrasonic_sensor_.header.stamp);
-  // ultrasonic_sensor_.radiation_type = sensor_msgs__msg__Range__ULTRASOUND;
-  // ultrasonic_sensor_.field_of_view = 2.1; // Example field of view in radians
-  // ultrasonic_sensor_.header.frame_id.data = "ultrasonic_sensor"; // Frame ID for the sensor
-  // ultrasonic_sensor_.min_range = 0.25; // Minimum range in meters
-  // ultrasonic_sensor_.max_range = 4.0; // Maximum range in meters
-  ultrasonic_sensor_.range = distance;
+  ultrasonic_sensor_.data.data[0] = distance / 100.0;
 
 }
 
@@ -281,8 +266,6 @@ void setup() {
       while(1);
   }
 
-  rmw_uros_sync_session(10);  // syncs every 10 seconds
-
   allocator = rcl_get_default_allocator();
 
   //create init_options
@@ -309,7 +292,7 @@ void setup() {
   RCCHECK(rclc_publisher_init_default(
     &ultrasonic_sensor_pub_,
     &mc_node,
-    ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Range),
+    ROSIDL_GET_MSG_TYPE_SUPPORT(std_msgs, msg, Float32MultiArray),
     "ultrasonic_sensor"));
 
   // create subscriber
@@ -343,7 +326,7 @@ void setup() {
     check_callback));
 
   // create timer,
-  const unsigned int ultrasonic_timer_timeout = 100;
+  const unsigned int ultrasonic_timer_timeout = 10;
   RCCHECK(rclc_timer_init_default(
     &ultrasonic_readings_timer,
     &support,
@@ -369,18 +352,11 @@ void setup() {
 
   check_.data = true;
 
-  builtin_interfaces__msg__Time now;
-  uint64_t time_ms = rmw_uros_epoch_millis();
-  now.sec = time_ms / 1000;
-  now.nanosec = (time_ms % 1000) * 1000000;
-  ultrasonic_sensor_.header.stamp = now;
-  ultrasonic_sensor_.radiation_type = sensor_msgs__msg__Range__ULTRASOUND;
-  // ultrasonic_sensor_.header.frame_id = "ultrasonic_sensor"; // Frame ID for the sensor
-  rosidl_runtime_c__String__assign(&ultrasonic_sensor_.header.frame_id, "ultrasonic_sensor");
-  ultrasonic_sensor_.field_of_view = 2.1; // Example field of view in radians
-  ultrasonic_sensor_.min_range = 0.20; // Minimum range in meters
-  ultrasonic_sensor_.max_range = 4.0; // Maximum range in meters
-  ultrasonic_sensor_.range = 0.0; // Example range value in meters
+  ultrasonic_sensor_.data.size = 1;
+  ultrasonic_sensor_.data.capacity = 1;
+  ultrasonic_sensor_.data.data = (float*) malloc(1 * sizeof(float));
+
+  encoder_readings_.data.data[0] = 0;
   
   wheel_vel_.data.size = 2;
   wheel_vel_.data.capacity = 2;
