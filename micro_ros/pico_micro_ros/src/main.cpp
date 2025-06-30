@@ -4,6 +4,7 @@
 #include <rmw_microros/rmw_microros.h>
 
 #include <rcl/rcl.h>
+#include <rcl/time.h>
 #include <rclc/rclc.h>
 #include <rclc/executor.h>
 
@@ -14,6 +15,7 @@
 #include <sensor_msgs/msg/range.h>
 #include <rmw_microros/time_sync.h>
 #include <builtin_interfaces/msg/time.h>
+#include "rosidl_runtime_c/string_functions.h"
 
 #if !defined(MICRO_ROS_TRANSPORT_ARDUINO_SERIAL)
 #error This example is only avaliable for Arduino framework with serial transport.
@@ -41,7 +43,7 @@ volatile bool last_A1 = 0;
 
 rcl_publisher_t encoder_readings_pub_;
 rcl_publisher_t check_pub_;
-rcl_publisher_t ultrsonic_sensor_pub_;
+rcl_publisher_t ultrasonic_sensor_pub_;
 
 rcl_subscription_t wheel_vel_sub_;
 rcl_subscription_t pid_values_sub_;
@@ -101,7 +103,7 @@ void check_callback(rcl_timer_t * timer, int64_t last_call_time) {
 void ultrasonic_readings_callback(rcl_timer_t * timer, int64_t last_call_time) {
   RCLC_UNUSED(last_call_time);
   if (timer != NULL) {
-    RCSOFTCHECK(rcl_publish(&ultrsonic_sensor_pub_, &ultrasonic_sensor_, NULL));
+    RCSOFTCHECK(rcl_publish(&ultrasonic_sensor_pub_, &ultrasonic_sensor_, NULL));
   }
 }
 
@@ -166,28 +168,31 @@ void encoder_callback_1() {
     }
 }
 
-// void ultrasonic_sensor_data() {
+void ultrasonic_sensor_data() {
 
-//   digitalWrite(TRIGPIN, LOW); // Set the trigger pin to low for 2uS
-//   delayMicroseconds(2);
-//   digitalWrite(TRIGPIN, HIGH); // Send a 10uS high to trigger ranging
-//   delayMicroseconds(20);
-//   digitalWrite(TRIGPIN, LOW); // Send pin low again
-//   distance = pulseIn(ECHOPIN, HIGH)/58; // Read in times pulse
+  digitalWrite(TRIGPIN, LOW); // Set the trigger pin to low for 2uS
+  delayMicroseconds(2);
+  digitalWrite(TRIGPIN, HIGH); // Send a 10uS high to trigger ranging
+  delayMicroseconds(20);
+  digitalWrite(TRIGPIN, LOW); // Send pin low again
+  distance = pulseIn(ECHOPIN, HIGH)/58; // Read in times pulse
 
-//   // Simulated ultrasonic sensor data
-//   builtin_interfaces__msg__Time now;
-//   uint64_t time_ms = rmw_uros_epoch_millis();
-//   now.sec = time_ms / 1000;
-//   now.nanosec = (time_ms % 1000) * 1000000;
-//   ultrasonic_sensor_.header.stamp = now;
-//   ultrasonic_sensor_.radiation_type = sensor_msgs__msg__Range__ULTRASOUND;
-//   ultrasonic_sensor_.field_of_view = 2.1; // Example field of view in radians
-//   ultrasonic_sensor_.min_range = 0.25; // Minimum range in meters
-//   ultrasonic_sensor_.max_range = 4.0; // Maximum range in meters
-//   ultrasonic_sensor_.range = distance; // Example range value in meters
+  distance = distance / 100.0; // Convert to meters
+  // Simulated ultrasonic sensor data
+  builtin_interfaces__msg__Time now;
+  uint64_t time_ms = rmw_uros_epoch_millis();
+  now.sec = time_ms / 1000;
+  now.nanosec = (time_ms % 1000) * 1000000;
+  ultrasonic_sensor_.header.stamp = now;
+  rclc_clock_get_now(&clock, &ultrasonic_sensor_.header.stamp);
+  // ultrasonic_sensor_.radiation_type = sensor_msgs__msg__Range__ULTRASOUND;
+  // ultrasonic_sensor_.field_of_view = 2.1; // Example field of view in radians
+  // ultrasonic_sensor_.header.frame_id.data = "ultrasonic_sensor"; // Frame ID for the sensor
+  // ultrasonic_sensor_.min_range = 0.25; // Minimum range in meters
+  // ultrasonic_sensor_.max_range = 4.0; // Maximum range in meters
+  ultrasonic_sensor_.range = distance;
 
-// }
+}
 
 void encoderReadings(){
   encoder_readings_.data.data[0] = encoder_count[0];
@@ -229,9 +234,6 @@ void moveMotors(){
   else
     v2 = 0;
 
-  // constrain(v1, -pwm_limit, pwm_limit);
-  // constrain(v2, -pwm_limit, pwm_limit);
-
   if(v1 > pwm_limit){
     v1 = 100;
   }
@@ -261,8 +263,8 @@ void setup() {
   pinMode(ENCODER_1_PIN_A, INPUT_PULLUP);
   pinMode(ENCODER_1_PIN_B, INPUT_PULLUP);
 
-  // pinMode(ECHOPIN, INPUT);
-  // pinMode(TRIGPIN, OUTPUT);
+  pinMode(ECHOPIN, INPUT);
+  pinMode(TRIGPIN, OUTPUT);
 
   attachInterrupt(digitalPinToInterrupt(ENCODER_0_PIN_A), encoder_callback_0, CHANGE);
   attachInterrupt(digitalPinToInterrupt(ENCODER_1_PIN_A), encoder_callback_1, CHANGE);
@@ -279,7 +281,7 @@ void setup() {
       while(1);
   }
 
-  // rmw_uros_sync_session(10);  // syncs every 10 seconds
+  rmw_uros_sync_session(10);  // syncs every 10 seconds
 
   allocator = rcl_get_default_allocator();
 
@@ -304,11 +306,11 @@ void setup() {
     "communication_check"));
   
   // create publisher
-  // RCCHECK(rclc_publisher_init_default(
-  //   &ultrsonic_sensor_pub_,
-  //   &mc_node,
-  //   ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Range),
-  //   "ultrsonic_sensor"));
+  RCCHECK(rclc_publisher_init_default(
+    &ultrasonic_sensor_pub_,
+    &mc_node,
+    ROSIDL_GET_MSG_TYPE_SUPPORT(sensor_msgs, msg, Range),
+    "ultrasonic_sensor"));
 
   // create subscriber
   RCCHECK(rclc_subscription_init_default(
@@ -341,18 +343,18 @@ void setup() {
     check_callback));
 
   // create timer,
-  // const unsigned int ultrasonic_timer_timeout = 10;
-  // RCCHECK(rclc_timer_init_default(
-  //   &ultrasonic_readings_timer,
-  //   &support,
-  //   RCL_MS_TO_NS(ultrasonic_timer_timeout),
-  //   ultrasonic_readings_callback));
+  const unsigned int ultrasonic_timer_timeout = 100;
+  RCCHECK(rclc_timer_init_default(
+    &ultrasonic_readings_timer,
+    &support,
+    RCL_MS_TO_NS(ultrasonic_timer_timeout),
+    ultrasonic_readings_callback));
 
   // create executor
-  RCCHECK(rclc_executor_init(&executor, &support.context, 4, &allocator));
+  RCCHECK(rclc_executor_init(&executor, &support.context, 5, &allocator));
   RCCHECK(rclc_executor_add_timer(&executor, &encoder_readings_timer));
   RCCHECK(rclc_executor_add_timer(&executor, &check_timer));
-  // RCCHECK(rclc_executor_add_timer(&executor, &ultrasonic_readings_timer));
+  RCCHECK(rclc_executor_add_timer(&executor, &ultrasonic_readings_timer));
   
   RCCHECK(rclc_executor_add_subscription(&executor, &wheel_vel_sub_, &wheel_vel_, &wheel_vel_callback, ON_NEW_DATA));
   RCCHECK(rclc_executor_add_subscription(&executor, &pid_values_sub_, &pid_values_, &pid_callback, ON_NEW_DATA));
@@ -366,6 +368,19 @@ void setup() {
   encoder_readings_.data.data[1] = 0;
 
   check_.data = true;
+
+  builtin_interfaces__msg__Time now;
+  uint64_t time_ms = rmw_uros_epoch_millis();
+  now.sec = time_ms / 1000;
+  now.nanosec = (time_ms % 1000) * 1000000;
+  ultrasonic_sensor_.header.stamp = now;
+  ultrasonic_sensor_.radiation_type = sensor_msgs__msg__Range__ULTRASOUND;
+  // ultrasonic_sensor_.header.frame_id = "ultrasonic_sensor"; // Frame ID for the sensor
+  rosidl_runtime_c__String__assign(&ultrasonic_sensor_.header.frame_id, "ultrasonic_sensor");
+  ultrasonic_sensor_.field_of_view = 2.1; // Example field of view in radians
+  ultrasonic_sensor_.min_range = 0.20; // Minimum range in meters
+  ultrasonic_sensor_.max_range = 4.0; // Maximum range in meters
+  ultrasonic_sensor_.range = 0.0; // Example range value in meters
   
   wheel_vel_.data.size = 2;
   wheel_vel_.data.capacity = 2;
@@ -383,23 +398,13 @@ void setup() {
   pid_values_.data.data[2] = 0;
   pid_values_.data.data[3] = 0;
 
-  // builtin_interfaces__msg__Time now;
-  // uint64_t time_ms = rmw_uros_epoch_millis();
-  // now.sec = time_ms / 1000;
-  // now.nanosec = (time_ms % 1000) * 1000000;
-  // ultrasonic_sensor_.header.stamp = now;
-  // ultrasonic_sensor_.radiation_type = sensor_msgs__msg__Range__ULTRASOUND;
-  // ultrasonic_sensor_.field_of_view = 2.1; // Example field of view in radians
-  // ultrasonic_sensor_.min_range = 0.25; // Minimum range in meters
-  // ultrasonic_sensor_.max_range = 4.0; // Maximum range in meters
-  // ultrasonic_sensor_.range = 0.0; // Example range value in meters
 
 }
 
 void loop() {
   // delay(100);
   encoderReadings();
-  // ultrasonic_sensor_data();
+  ultrasonic_sensor_data();
   moveMotors();
   RCSOFTCHECK(rclc_executor_spin_some(&executor, RCL_MS_TO_NS(1)));
 }
