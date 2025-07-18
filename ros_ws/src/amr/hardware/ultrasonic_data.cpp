@@ -8,7 +8,7 @@ public:
     UltrasonicData() : Node("ultrasonic_data_node")
     {
         subscription_ = this->create_subscription<std_msgs::msg::Float32MultiArray>(
-            "ultrsonic_sensor", 10,
+            "ultrasonic_sensor", 10,
             std::bind(&UltrasonicData::data_callback, this, std::placeholders::_1)
         );
 
