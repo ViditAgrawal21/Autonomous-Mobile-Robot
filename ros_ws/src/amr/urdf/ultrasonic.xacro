@@ -5,12 +5,13 @@
     <xacro:property name="ultrasonic_mass" value="0.02" />
     <xacro:property name="ultrasonic_radius" value="0.0125" />
     <xacro:property name="ultrasonic_length" value="0.021" />
-
     
+
+
     <joint name="base_ultrasonic_sensor_joint" type="fixed">
         <parent link="base_link" />
         <child link="ultrasonic_sensor" />
-        <origin xyz="${0.3 - ultrasonic_radius} ${0.25 - ultrasonic_length} 0.0275" rpy="${pi/2} 0 ${pi / 4}" />
+        <origin xyz="${0.3 - ultrasonic_radius} ${0.25 - ultrasonic_length} 0.0275" rpy="0 0 0" />
     </joint>
 
     <link name="ultrasonic_sensor">
@@ -18,9 +19,10 @@
             <geometry>
                 <cylinder radius="${ultrasonic_radius}" length="${ultrasonic_length}"/>
             </geometry>
-            <origin xyz="0 0 0" rpy="0 0 0"/>
+            <origin xyz="0 0 0" rpy="${pi / 2} 0 0"/>
             <material name="green"/>
         </visual>
+
         <collision>
             <geometry>
                 <cylinder radius="${ultrasonic_radius}" length="${ultrasonic_length}"/>
