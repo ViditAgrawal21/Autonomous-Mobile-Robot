@@ -9,7 +9,7 @@ public:
     : Node("twist_to_stamped")
     {
         twist_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
-            "/cmd_vel", 10,
+            "/unstamped_vel", 10,
             std::bind(&TwistToStampedNode::twist_callback, this, std::placeholders::_1));
 
         twist_stamped_pub_ = this->create_publisher<geometry_msgs::msg::TwistStamped>(
