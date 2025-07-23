@@ -138,14 +138,6 @@ def generate_launch_description():
             }]
         )
 
-    #Delay joint_state_broadcaster_spawner until `ros2_control_node` is ready
-    delay_joint_state_broadcaster_spawner = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=control_node,
-            on_exit=[joint_state_broadcaster_spawner],
-        )
-    )
-
     # Delay rviz start after `joint_state_broadcaster
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
         event_handler=OnProcessExit(
@@ -173,7 +165,6 @@ def generate_launch_description():
     nodes = [
         control_node,
         robot_state_pub_node,
-        delay_joint_state_broadcaster_spawner,
         joint_state_broadcaster_spawner,
         # delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
