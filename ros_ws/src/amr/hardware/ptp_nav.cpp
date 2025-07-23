@@ -1,28 +1,3 @@
-// #include "rclcpp/rclcpp.hpp"
-// #include "geometry_msgs/msg/pose_stamped.hpp"
-
-// class PTPNavNode : public rclcpp::Node
-// {
-//     public:
-//         PTPNavNode()
-//         : Node("ptp_nav_node")
-//         {
-//         }
-    
-//     private:
-//         geometry_msgs::msg::PoseStamped poses[3];
-              
-
-// };
-
-// int main(int argc, char *argv[])
-// {
-//     rclcpp::init(argc, argv);
-//     rclcpp::spin(std::make_shared<PTPNavNode>());
-//     rclcpp::shutdown();
-//     return 0;
-// }
-
 #include "rclcpp/rclcpp.hpp"
 #include "nav2_msgs/action/navigate_to_pose.hpp"
 #include "rclcpp_action/rclcpp_action.hpp"
@@ -33,13 +8,13 @@
 using std::placeholders::_1;
 using std::placeholders::_2;
 
-class PatrolNode : public rclcpp::Node
+class PtpNode : public rclcpp::Node
 {
 public:
   using NavigateToPose = nav2_msgs::action::NavigateToPose;
   using GoalHandleNavigateToPose = rclcpp_action::ClientGoalHandle<NavigateToPose>;
 
-  PatrolNode() : Node("patrol_node"), current_goal_index_(0)
+  PtpNode() : Node("ptp_node"), current_goal_index_(0)
   {
     action_client_ = rclcpp_action::create_client<NavigateToPose>(this, "navigate_to_pose");
 
@@ -49,7 +24,7 @@ public:
 
     timer_ = this->create_wall_timer(
       std::chrono::seconds(1),
-      std::bind(&PatrolNode::send_next_goal, this));
+      std::bind(&PtpNode::send_next_goal, this));
   }
 
 private:
@@ -86,7 +61,7 @@ private:
 
     auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
     send_goal_options.result_callback =
-      std::bind(&PatrolNode::result_callback, this, _1);
+      std::bind(&PtpNode::result_callback, this, _1);
 
     action_client_->async_send_goal(goal, send_goal_options);
 
@@ -112,7 +87,7 @@ private:
 int main(int argc, char ** argv)
 {
   rclcpp::init(argc, argv);
-  auto node = std::make_shared<PatrolNode>();
+  auto node = std::make_shared<PtpNode>();
   rclcpp::spin(node);
   rclcpp::shutdown();
   return 0;
