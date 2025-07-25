@@ -7,8 +7,10 @@ endif()
 
 # find dependencies
 find_package(ament_cmake REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(sensor_msgs REQUIRED)
 find_package(nav2_msgs REQUIRED)
 find_package(rclcpp_action REQUIRED)
 find_package(tf2 REQUIRED)
@@ -17,8 +19,20 @@ find_package(tf2_geometry_msgs REQUIRED)
 # further dependencies manually.
 # find_package(<dependency> REQUIRED)
 
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "interfaces/msg/BatteryPercentage.msg"
+)
+
+ament_export_dependencies(rosidl_default_runtime)
+
+
 add_executable(twist_to_stamped hardware/twist_to_stamped.cpp)   #"cpp_node" name of executable
 ament_target_dependencies(twist_to_stamped rclcpp geometry_msgs)         #these two lines create an executable but not install it
+add_executable(ultrasonic_data hardware/ultrasonic_data.cpp)   #"cpp_node" name of executable
+ament_target_dependencies(ultrasonic_data rclcpp std_msgs sensor_msgs)         #these two lines create an executable but not install it
+
+add_executable(ultrasonic_to_laserscan hardware/ultrasonic_to_laserscan.cpp)   #"cpp_node" name of executable
+ament_target_dependencies(ultrasonic_to_laserscan rclcpp sensor_msgs std_msgs)         #these two lines create an executable but not install it
 
 
 add_executable(ptp_nav hardware/ptp_nav.cpp)   #"cpp_node" name of executable
@@ -43,6 +57,8 @@ install(
 
 install(TARGETS            #installs the executable
   twist_to_stamped
+  ultrasonic_data
+  ultrasonic_to_laserscan
   ptp_nav
   DESTINATION lib/${PROJECT_NAME}
 )
