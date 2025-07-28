@@ -14,12 +14,18 @@ def generate_launch_description():
 
     # Launch the first launch file
     robot_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/home/nikhil/Work/technowings/Autonomous-Mobile-Robot/ros_ws/src/amr/launch/ros2_control_robot.launch.py'])
+        PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/ros2_control_robot.launch.py'])
+    )
+
+    robot_controller_spawner = Node(
+        package="controller_manager",
+        executable="spawner",
+        arguments=["diff_drive_controller", "--controller-manager", "/controller_manager"],
     )
 
     # Launch the second launch file
     nav2_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/opt/ros/jazzy/share/nav2_bringup/launch/bringup_launch.py']),
+        PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/bringup_launch.py']),
         launch_arguments={
             'map': map_path,
             'params_file': param_path,
@@ -31,7 +37,7 @@ def generate_launch_description():
     # Delay rviz start after `joint_state_broadcaster
     delay_nav2_launch = RegisterEventHandler(
         event_handler=OnProcessExit(
-            target_action=robot_launch,
+            target_action=robot_controller_spawner,
             on_exit=[nav2_launch],
         )
     )
@@ -45,6 +51,7 @@ def generate_launch_description():
     # )
 
     node = [robot_launch,
+            robot_controller_spawner,
             delay_nav2_launch,
             ]
 
