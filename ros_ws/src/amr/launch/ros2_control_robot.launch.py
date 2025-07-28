@@ -27,6 +27,7 @@ from launch.actions import ExecuteProcess
 def generate_launch_description():
 
     joy_params = os.path.join(get_package_share_directory('amr'),'config','joystick.yaml')
+    twist_mux_params = os.path.join(get_package_share_directory('amr'),'config','twist_mux.yaml')
 
     # Get URDF via xacro
     robot_description_content = Command(
@@ -86,26 +87,45 @@ def generate_launch_description():
         arguments=["diff_drive_controller", "--controller-manager", "/controller_manager"],
     )
 
-    joy_node = Node(
-            package='joy',
-            executable='joy_node',
-            parameters=[joy_params],
-         )
+    # joy_node = Node(
+    #         package='joy',
+    #         executable='joy_node',
+    #         parameters=[joy_params],
+    #      )
 
-    teleop_node = Node(
-            package='teleop_twist_joy',
-            executable='teleop_node',
-            name='teleop_node',
-            parameters=[joy_params],
-            # remappings=[('/cmd_vel','/twist_vel')]
-         )
+    # teleop_node = Node(
+    #         package='teleop_twist_joy',
+    #         executable='teleop_node',
+    #         name='teleop_node',
+    #         parameters=[joy_params],
+    #         remappings=[('/cmd_vel','/cmd_vel_joy')]
+    #      )
+    
+    twist_mux = Node(
+            package="twist_mux",
+            executable="twist_mux",
+            parameters=[twist_mux_params],
+            remappings=[('/cmd_vel_out','/unstamped_vel')]
+        )
     
     twist_to_stamped_node = Node(
             package='amr',
             executable='twist_to_stamped',
             name='twist_to_stamped',
          )
-    
+        
+    ultrasonic_data_node = Node(
+            package='amr',
+            executable='ultrasonic_data',
+            name='ultrasonic_data',
+         )
+            
+    ultrasonic_to_laserscan_node = Node(
+            package='amr',
+            executable='ultrasonic_to_laserscan',
+            name='ultrasonic_to_laserscan',
+         )
+
     lidar_node = Node(
             package='rplidar_ros',
             executable='rplidar_composition',
@@ -117,14 +137,6 @@ def generate_launch_description():
                 'scan_mode': 'Standard'
             }]
         )
-
-    #Delay joint_state_broadcaster_spawner until `ros2_control_node` is ready
-    delay_joint_state_broadcaster_spawner = RegisterEventHandler(
-        event_handler=OnProcessExit(
-            target_action=control_node,
-            on_exit=[joint_state_broadcaster_spawner],
-        )
-    )
 
     # Delay rviz start after `joint_state_broadcaster
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
@@ -153,13 +165,15 @@ def generate_launch_description():
     nodes = [
         control_node,
         robot_state_pub_node,
-        delay_joint_state_broadcaster_spawner,
         joint_state_broadcaster_spawner,
         # delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
-        joy_node,
-        teleop_node,
+        # joy_node,
+        # teleop_node,
+        twist_mux,
         twist_to_stamped_node,
+        # ultrasonic_data_node,
+        ultrasonic_to_laserscan_node,
         micro_ros_agent_process,
         lidar_node,
     ]
