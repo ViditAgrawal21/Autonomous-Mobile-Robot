@@ -87,19 +87,19 @@ def generate_launch_description():
         arguments=["diff_drive_controller", "--controller-manager", "/controller_manager"],
     )
 
-    # joy_node = Node(
-    #         package='joy',
-    #         executable='joy_node',
-    #         parameters=[joy_params],
-    #      )
+    joy_node = Node(
+            package='joy',
+            executable='joy_node',
+            parameters=[joy_params],
+         )
 
-    # teleop_node = Node(
-    #         package='teleop_twist_joy',
-    #         executable='teleop_node',
-    #         name='teleop_node',
-    #         parameters=[joy_params],
-    #         remappings=[('/cmd_vel','/cmd_vel_joy')]
-    #      )
+    teleop_node = Node(
+            package='teleop_twist_joy',
+            executable='teleop_node',
+            name='teleop_node',
+            parameters=[joy_params],
+            remappings=[('/cmd_vel','/cmd_vel_ps4_controller')]
+         )
     
     twist_mux = Node(
             package="twist_mux",
@@ -137,6 +137,16 @@ def generate_launch_description():
                 'scan_mode': 'Standard'
             }]
         )
+    
+    laser_filter = Node(
+            package="laser_filters",
+            executable="scan_to_scan_filter_chain",
+            parameters=[
+                PathJoinSubstitution([
+                    get_package_share_directory("amr"),
+                    "config", "scan_filter.yaml",
+                ])],
+    )
 
     # Delay rviz start after `joint_state_broadcaster
     delay_rviz_after_joint_state_broadcaster_spawner = RegisterEventHandler(
@@ -168,14 +178,15 @@ def generate_launch_description():
         joint_state_broadcaster_spawner,
         # delay_rviz_after_joint_state_broadcaster_spawner,
         delay_robot_controller_spawner_after_joint_state_broadcaster_spawner,
-        # joy_node,
-        # teleop_node,
+        joy_node,
+        teleop_node,
         twist_mux,
         twist_to_stamped_node,
         # ultrasonic_data_node,
         ultrasonic_to_laserscan_node,
         micro_ros_agent_process,
         lidar_node,
+        laser_filter,
     ]
 
     return LaunchDescription(nodes)

@@ -34,7 +34,7 @@ diff_drive_controller:
 
     # cmd_vel_timeout: 0.1      # timeout of vel = 0, when no data is received
     # #publish_limited_velocity: true
-    use_stamped_vel: false
+    # use_stamped_vel: false
     # #velocity_rolling_window_size: 10
 
     # # Velocity and acceleration limits

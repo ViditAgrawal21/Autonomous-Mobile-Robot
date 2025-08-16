@@ -6,5 +6,6 @@
     "python.analysis.extraPaths": [
         "/home/nikhil/Work/ros2/microros_ws/install/micro_ros_msgs/lib/python3.12/site-packages",
         "/opt/ros/jazzy/lib/python3.12/site-packages"
-    ]
+    ],
+    "cmake.sourceDirectory": "/home/piros/fleet-management-system/ros_ws/src/amr"
 }

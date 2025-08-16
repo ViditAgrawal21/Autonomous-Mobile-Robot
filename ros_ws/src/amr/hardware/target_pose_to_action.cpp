@@ -67,6 +67,9 @@ class TargetPoseToAction : public rclcpp::Node
       auto send_goal_options = rclcpp_action::Client<NavigateToPose>::SendGoalOptions();
       send_goal_options.result_callback =
         std::bind(&TargetPoseToAction::result_callback, this, std::placeholders::_1);
+
+      
+      action_client_->async_send_goal(goal, send_goal_options);
     }
 
     void target_pose_callback(const Pose::SharedPtr msg)
