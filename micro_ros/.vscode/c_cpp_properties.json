@@ -1,0 +1,38 @@
+{
+  "configurations": [
+    {
+      "browse": {
+        "databaseFilename": "${default}",
+        "limitSymbolsToIncludedHeaders": false
+      },
+      "includePath": [
+        "/home/nikhil/Work/ros2/microros_ws/install/micro_ros_agent/include/**",
+        "/home/nikhil/Work/ros2/microros_ws/install/micro_ros_msgs/include/**",
+        "/home/nikhil/Work/technowings/Autonomous-Mobile-Robot/ros_ws/install/ros2_control_demo_example_16/include/**",
+        "/home/nikhil/Work/ROS2/control_ws/install/three_wheel/include/**",
+        "/home/nikhil/Work/ROS2/control_ws/install/diff_drive/include/**",
+        "/opt/ros/jazzy/include/**",
+        "/home/nikhil/Downloads/Work/ROS/controller_ws/src/diff_drive_controller/include/**",
+        "/home/nikhil/Downloads/Work/ROS/controller_ws/src/three_omniwheel_controller/include/**",
+        "/home/nikhil/Downloads/Work/ROS/ros2_ws/src/course_activities/include/**",
+        "/home/nikhil/Downloads/Work/ROS/ros2_ws/src/cpp_pkg/include/**",
+        "/home/nikhil/Downloads/Work/ROS/rplidar_ws/src/rplidar_ros/include/**",
+        "/home/nikhil/Downloads/Work/ros2/basketball_bot/src/lidar_odometry/include/**",
+        "/home/nikhil/Downloads/Work/technowings/fleet-management-system/ros_ws/src/amr/include/**",
+        "/home/nikhil/Downloads/Work/three_omniwheel_controller/include/**",
+        "/home/nikhil/Work/ROS2/controller_ws/src/diff_drive_controller/include/**",
+        "/home/nikhil/Work/ROS2/controller_ws/src/three_omniwheel_controller/include/**",
+        "/home/nikhil/Work/ros2/basketball_bot/src/lidar_odometry/include/**",
+        "/home/nikhil/Work/ros2/microros_ws/src/uros/micro-ROS-Agent/micro_ros_agent/include/**",
+        "/home/nikhil/src/uros/micro-ROS-Agent/micro_ros_agent/include/**",
+        "/usr/include/**"
+      ],
+      "name": "ROS",
+      "intelliSenseMode": "gcc-x64",
+      "compilerPath": "/usr/bin/gcc",
+      "cStandard": "gnu11",
+      "cppStandard": "c++14"
+    }
+  ],
+  "version": 4
+}

@@ -1,10 +1,10 @@
 #include <Arduino.h>
 
 
-#define ENCODER_0_PIN_A 18
-#define ENCODER_0_PIN_B 19
-#define ENCODER_1_PIN_A 20
-#define ENCODER_1_PIN_B 21
+#define ENCODER_0_PIN_A 21
+#define ENCODER_0_PIN_B 20
+#define ENCODER_1_PIN_A 18
+#define ENCODER_1_PIN_B 19
 
 volatile int32_t encoder_count[2] = {0};
 volatile bool last_A0 = 0;
@@ -61,6 +61,6 @@ void loop() {
   encoder_callback_1();
   // Serial.println("Encoder readings:");
   Serial.print("Encoder 0 Count: " + String(encoder_count[0]));
-  // Serial.println("      Encoder 1 Count: " + String(encoder_count[1]));
+  Serial.println("      Encoder 1 Count: " + String(encoder_count[1]));
   delay(100); // Adjust the delay as needed
 }
