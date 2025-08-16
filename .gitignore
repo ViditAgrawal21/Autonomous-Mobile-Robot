@@ -2,3 +2,6 @@
 /ros_ws/install
 /ros_ws/log
 # /ros_ws/src/amr/meshes
+ros_ws/src/amr/.vscode/browse.vc.db
+ros_ws/src/amr/.vscode/browse.vc.db-shm
+ros_ws/src/amr/.vscode/browse.vc.db-wal
