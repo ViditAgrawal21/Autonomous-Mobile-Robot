@@ -18,9 +18,10 @@ public:
   {
     action_client_ = rclcpp_action::create_client<NavigateToPose>(this, "navigate_to_pose");
 
-    goals_.push_back(create_goal(1.0, 0.0, 0.0));        // Goal A
-    goals_.push_back(create_goal(2.0, 2.0, M_PI / 2));   // Goal B
-    goals_.push_back(create_goal(0.0, 2.0, M_PI));       // Goal C
+    goals_.push_back(create_goal(0.8, 0.2, 0.0));        // Goal A
+    goals_.push_back(create_goal(0.0, -1.0, 3 * M_PI / 2));   // Goal B
+    goals_.push_back(create_goal(0.2, -0.1, 0.0));       // Goal C
+    goals_.push_back(create_goal(1.0, -1.0, M_PI));       // Goal D
 
     timer_ = this->create_wall_timer(
       std::chrono::seconds(1),

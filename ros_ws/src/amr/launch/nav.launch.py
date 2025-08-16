@@ -1,3 +1,4 @@
+import os
 from launch import LaunchDescription
 from launch_ros.actions import Node
 from launch.actions import IncludeLaunchDescription, TimerAction
@@ -9,12 +10,12 @@ from launch.event_handlers import OnProcessExit
 def generate_launch_description():
 
     # Map and param file paths
-    map_path = '/home/piros/fleet-management-system/ros_ws/src/amr/maps/map_1750065869.yaml'
+    map_path = '/home/piros/fleet-management-system/ros_ws/src/amr/maps/tw_rnd.yaml'
     param_path = '/home/piros/fleet-management-system/ros_ws/src/amr/config/nav2_params1.yaml'
 
     # Launch the first launch file
     robot_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/ros2_control_robot.launch.py'])
+        PythonLaunchDescriptionSource(os.path.join(os.path.dirname(__file__), 'ros2_control_robot.launch.py'))
     )
 
     robot_controller_spawner = Node(
@@ -25,7 +26,7 @@ def generate_launch_description():
 
     # Launch the second launch file
     nav2_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource([ThisLaunchFileDir(), '/bringup_launch.py']),
+        PythonLaunchDescriptionSource(os.path.join(os.path.dirname(__file__), 'bringup_launch.py')),
         launch_arguments={
             'map': map_path,
             'params_file': param_path,
