@@ -1,0 +1,16 @@
+{
+    "python.autoComplete.extraPaths": [
+        "/home/piros/Work/ROS2/microros_ws/install/micro_ros_msgs/lib/python3.12/site-packages",
+        "/home/piros/fleet-management-system/ros_ws/install/custom_interfaces/lib/python3.12/site-packages",
+        "/home/piros/fleet-management-system/ros_ws/install/amr/lib/python3.12/site-packages",
+        "/home/piros/fleet-management-system/ros_ws/install/amr_python_pkg/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ],
+    "python.analysis.extraPaths": [
+        "/home/piros/Work/ROS2/microros_ws/install/micro_ros_msgs/lib/python3.12/site-packages",
+        "/home/piros/fleet-management-system/ros_ws/install/custom_interfaces/lib/python3.12/site-packages",
+        "/home/piros/fleet-management-system/ros_ws/install/amr/lib/python3.12/site-packages",
+        "/home/piros/fleet-management-system/ros_ws/install/amr_python_pkg/lib/python3.12/site-packages",
+        "/opt/ros/jazzy/lib/python3.12/site-packages"
+    ]
+}
