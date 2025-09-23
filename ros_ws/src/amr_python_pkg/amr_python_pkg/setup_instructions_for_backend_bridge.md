@@ -2,7 +2,7 @@ Setup Instructions:
 
 # 1) Copy the script to your AMR:
 
-bashssh pi@192.168.128.240
+**bashssh pi@192.168.128.240
 nano ~/amr_backend_bridge.py
 --Paste the code above
 chmod +x ~/amr_backend_bridge.py
