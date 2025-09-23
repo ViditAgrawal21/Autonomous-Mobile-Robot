@@ -1,8 +1,8 @@
 # Setup Instructions:
 
 ## 1) Copy the script to your AMR:
-- ssh piros@192.168.x.x,
-- nano ~/amr_backend_bridge.py,
+- ssh piros@192.168.x.x
+- nano ~/amr_backend_bridge.py
 - chmod +x ~/amr_backend_bridge.py
 
 ## 2) Install dependencies:
